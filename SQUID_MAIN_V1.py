@@ -37,6 +37,7 @@ to_db_status=0
 from_db_status=0
 db_start=0
 set_WiFi=0
+update=0
 main=0
 led=0
 adc=0
@@ -48,6 +49,7 @@ connection_for_data_and_variables=None
 variables_list=[3,3,3,3,3,"0","0"]
 
 bias=16
+last_bias=0
 
 numbers=7200
 Quant=0
@@ -184,7 +186,7 @@ def Create_connection():
             
 def Request_data_to_server():
     global server_host, server_dbname, server_username, server_password
-    global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list
+    global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list, update
     global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries
     
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass
@@ -200,13 +202,13 @@ def Request_data_to_server():
         
         
                     
-        if write_data_thread_status==1 and set_WiFi==0:
+        if write_data_thread_status==1 and set_WiFi==0 and update==0:
             
             #print(connection_for_data_and_variables.isolation_level)
             
             data_time=time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             data_list=(data_sn, data_time, data_zone, data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3, data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3, data_wt)
-#             print(data_time)
+            print(data_list)
             if to_db_status==0 and from_db_status==0:                
                 try:
                     try:
@@ -462,9 +464,10 @@ def Check_connection():
                 
                 
 def IO_update():
-    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias
+    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias
     
     if variable_all_OFF==0: #all outputs in auto/manual mode
+        bias=16
         if (variable_RT1==0) & (GPIO.input(therm1_stat)==GPIO.HIGH):
             GPIO.output(pump_ctrl1, GPIO.HIGH)
             bias|=(1<<3)
@@ -516,14 +519,14 @@ def IO_update():
         GPIO.output(pump_ctrl2, GPIO.HIGH)
         GPIO.output(pump_ctrl3, GPIO.HIGH)
         GPIO.output(endswitch_ctrl, GPIO.HIGH)
-        bias+=15
+        bias=31
         
     if variable_all_OFF==2: #all outputs OFF
         GPIO.output(pump_ctrl1, GPIO.LOW)
         GPIO.output(pump_ctrl2, GPIO.LOW)
         GPIO.output(pump_ctrl3, GPIO.LOW)
         GPIO.output(endswitch_ctrl, GPIO.LOW)
-        bias-=15
+        bias=16
     
     if GPIO.input(therm1_stat)==GPIO.HIGH:
         data_rt1=1;
@@ -539,14 +542,17 @@ def IO_update():
         data_rt3=1;
     if GPIO.input(therm3_stat)==GPIO.LOW:
         data_rt3=0;
-    
-    try:    
-        tmp = bus.read_i2c_block_data(address, bias)
-    except BaseException:
-        print("bias error")  
+
+    if last_bias!=bias:
+        try:    
+            tmp = bus.read_i2c_block_data(address, bias)
+            last_bias=bias
+        except BaseException:
+            print("bias error")
+        
    
-def Reset_Wi_Fi():
-    global connection_for_data_and_variables, cursor, set_WiFi, variables_list, WIFI_LED_ON
+def Reset_WiFi():
+    global connection_for_data_and_variables, cursor, set_WiFi, variables_list
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass
     
     variable_wifipass="0"    
@@ -565,6 +571,20 @@ def Reset_Wi_Fi():
     
     GPIO.output(pin_LED_WiFi, GPIO.LOW)
     
+def Update_source():
+    global connection_for_data_and_variables, cursor, set_WiFi, variables_list
+    global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass
+   
+    variable_wifiid="0"
+    variable_wifipass="0"    
+    data_list=[SN, variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass]
+    variables_list=data_list
+    
+    cursor.execute('INSERT INTO devicevariables (sn, rt1, rt2, rt3, blr, allof, wifiid, wifipass) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);',data_list)
+    connection_for_data_and_variables.commit()
+    
+    os.system('curl https://github.com/AlexShten/NYC_project/blob/main/SQIUD_MQIN_V1.py -o /home/pi/GitHub_source/SQUID_MAIN_V1.py')
+    os.system('reboot')
 #----------------------------------------------------------------------------------------------------
             
 def Read_ADCs():
@@ -575,8 +595,6 @@ def Read_ADCs():
             
             try:
                 tmp = bus.read_i2c_block_data(address, 1)  # read channel 1 from arduino
-                #print(tmp[0])
-                #print(tmp[1])
                 number = (tmp[0] + tmp[1] * 256)/1000
                 data_ics1 = round(number,2)
             except BaseException:
@@ -997,13 +1015,20 @@ if __name__ == "__main__":
             
             IO_update()
 
-            if variable_wifipass=="1":
+            if variable_wifipass=="1" and variable_wifiid=="0":
                 
                 GPIO.output(pin_LED_WiFi, GPIO.HIGH)                
                 set_WiFi=1    
     
                 time.sleep(3)
-                Reset_Wi_Fi()
+                Reset_WiFi()
+                
+            if variable_wifipass=="1" and variable_wifiid=="1":
+                
+                update=1
+                
+                time.sleep(3)
+                Update_source()
             
             #---------------------------???????????????How to replace sensor???????
             for i in range(quantity_temp_sens):
