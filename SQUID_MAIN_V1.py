@@ -199,9 +199,9 @@ def Request_data_to_server():
     Create_connection()
 
     while True:
-        
-        
-                    
+
+
+
         if write_data_thread_status==1 and set_WiFi==0 and update==0:
             
             #print(connection_for_data_and_variables.isolation_level)
@@ -296,7 +296,7 @@ def Request_data_to_server():
                 variable_wifiid=variables_list[5]
                 variable_wifipass=variables_list[6]
                     
-                write_data_thread_status=0
+                #write_data_thread_status=0
                 WIFI_LED_ON=0
 #                 print("5")
 #                 print(time.perf_counter())
