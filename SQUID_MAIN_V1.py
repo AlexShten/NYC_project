@@ -9,6 +9,7 @@ import RPi.GPIO as GPIO
 import smbus
 from w1thermsensor import W1ThermSensor
 
+from pyowm import OWM
 import sqlite3
 import psycopg2
 from psycopg2 import extensions, connect, InterfaceError, DatabaseError, OperationalError
@@ -24,6 +25,10 @@ SN=sys.argv[1]#"Test_SN_UA"# read from file
 TZ="UTC"
 path_to_file="/home/pi/sensorsID.txt"
 cmd="nice -20 python3 /home/pi/SQUID_MAIN_V1.py cat /boot/sources/SQUID_ID.txt"
+
+owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
+mgr = owm.weather_manager()
+observation = mgr.weather_at_place('New York,US')
 
 quantity_temp_sens=7# read from file
 #----------------------------------------------------------
@@ -1016,6 +1021,9 @@ if __name__ == "__main__":
         if main==1:
             
             IO_update()
+
+            w=observation.weather
+            print(w.temperature('celsius'))
 
             if variable_wifipass=="1" and variable_wifiid=="0":
                 
