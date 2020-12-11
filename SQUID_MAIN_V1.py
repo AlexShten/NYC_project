@@ -208,7 +208,7 @@ def Request_data_to_server():
             
             data_time=time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             data_list=(data_sn, data_time, data_zone, data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3, data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3, data_wt)
-            print(data_list)
+            #print(data_list)
             if to_db_status==0 and from_db_status==0:                
                 try:
                     try:
