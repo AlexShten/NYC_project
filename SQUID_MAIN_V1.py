@@ -726,7 +726,7 @@ def Read_temps():
 
         if sensor1_ready==True:
             try:            
-                data_t1=(sensor1.get_temperature())
+                data_t1=(sensor1.get_temperature())*1.8+32
                 if sensor1_error==0:
                     error_t1=0
                     sensor1_error=1
@@ -749,7 +749,7 @@ def Read_temps():
 
         if sensor2_ready==True:
             try:
-                data_t2=(sensor2.get_temperature())
+                data_t2=(sensor2.get_temperature())*1.8+32
                 if sensor2_error==0:
                     error_t2=0
                     sensor2_error=1
@@ -772,7 +772,7 @@ def Read_temps():
 
         if sensor3_ready==True:
             try:
-                data_t3=(sensor3.get_temperature())
+                data_t3=(sensor3.get_temperature())*1.8+32
                 if sensor3_error==0:
                     error_t3=0
                     sensor3_error=1
@@ -795,7 +795,7 @@ def Read_temps():
 
         if sensor4_ready==True:
             try:
-                data_t4=(sensor4.get_temperature())
+                data_t4=(sensor4.get_temperature())*1.8+32
                 if sensor4_error==0:
                     error_t4=0
                     sensor4_error=1
@@ -818,7 +818,7 @@ def Read_temps():
 
         if sensor5_ready==True:
             try:
-                data_t5=(sensor5.get_temperature())
+                data_t5=(sensor5.get_temperature())*1.8+32
                 if sensor5_error==0:
                     error_t5=0
                     sensor5_error=1
@@ -841,7 +841,7 @@ def Read_temps():
 
         if sensor6_ready==True:
             try:
-                data_t6=(sensor6.get_temperature())
+                data_t6=(sensor6.get_temperature())*1.8+32
                 if sensor6_error==0:
                     error_t6=0
                     sensor6_error=1
@@ -864,7 +864,7 @@ def Read_temps():
             
         if sensor7_ready==True:
             try:
-                data_t7=(sensor7.get_temperature())
+                data_t7=(sensor7.get_temperature())*1.8+32
                 if sensor7_error==0:
                     error_t7=0
                     sensor7_error=1
