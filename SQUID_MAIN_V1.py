@@ -583,7 +583,8 @@ def Update_source():
     cursor.execute('INSERT INTO devicevariables (sn, rt1, rt2, rt3, blr, allof, wifiid, wifipass) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);',data_list)
     connection_for_data_and_variables.commit()
     
-    os.system('curl https://github.com/AlexShten/NYC_project/blob/main/SQIUD_MQIN_V1.py -o /home/pi/GitHub_source/SQUID_MAIN_V1.py')
+
+    os.system('curl -L https://raw.githubusercontent.com/AlexShten/NYC_project/main/SQUID_MAIN_V1.py -o /home/pi/GitHub_source/SQUID_MAIN_V1.py')
     os.system('reboot')
 #----------------------------------------------------------------------------------------------------
             
