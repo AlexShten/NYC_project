@@ -631,7 +631,7 @@ def Read_ADCs():
                 
             try:
                 tmp = bus.read_i2c_block_data(address, 6)  # read channel 6 from arduino
-                number = (tmp[0] + tmp[1] * 256)
+                number = (tmp[0] + tmp[1] * 256)*0.17
                 data_ps = round(number,2)
             except BaseException:
                 print("data_PS error")
