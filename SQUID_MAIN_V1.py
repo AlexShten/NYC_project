@@ -81,6 +81,7 @@ data_rt1=0
 data_rt2=0
 data_rt3=0
 data_boiler=0
+data_end=0
 data_wt=0
 #---------------------------
 error_sn=SN
@@ -193,7 +194,7 @@ def Request_data_to_server():
     
     global data_sn, data_time, data_zone, data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3
     global data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3
-    global data_wt
+    global data_wt, data_end
     
     connection_for_data_and_variables=None
     Create_connection()
@@ -207,7 +208,7 @@ def Request_data_to_server():
             #print(connection_for_data_and_variables.isolation_level)
             
             data_time=time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
-            data_list=(data_sn, data_time, data_zone, data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3, data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3, data_wt)
+            data_list=(data_sn, data_time, data_zone, data_boilerpumpfunamps, data_ics1, data_ics2, data_ics3, data_boiler, data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_rt1, data_rt2, data_rt3, data_end, data_ps, data_wt)
             #print(data_list)
             if to_db_status==0 and from_db_status==0:                
                 try:
@@ -216,8 +217,8 @@ def Request_data_to_server():
 #                         print(time.perf_counter())
 #                         print("---------")
                         cursor.execute('INSERT INTO \
-                            devicedata (sn, time, zone, boilerpumpfanamps, ics1, ics2, ics3, \
-                            t1, t2, t3, t4, t5, t6, t7, ps, rt1, rt2, rt3, boiler, wt) \
+                            devicedata (sn, time, zone, icsmain, icsz1, icsz2, icsz3, \
+                            icsboiler, t1, t2, t3, t4, t5, t6, t7, rt1, rt2, rt3, endswitch, ps, weather) \
                             VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);',data_list)
                     except psycopg2.DatabaseError as e:
                         print("cursor.execute1")
