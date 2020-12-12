@@ -127,7 +127,7 @@ def Print_error(Source, Error):
     
     
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer
     
     MAIN_TIME_LAST=0
     while True:
@@ -139,7 +139,7 @@ def System_tick_1_sec():
             read_vars_thread_status=1
             db_thread_status=1
             main=1
-            adc=
+            adc=1
             weather_timer+=1
             
             MAIN_TIME_LAST=MAIN_TIME_NEXT
