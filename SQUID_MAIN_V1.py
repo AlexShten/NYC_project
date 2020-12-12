@@ -28,7 +28,7 @@ cmd="nice -20 python3 /home/pi/SQUID_MAIN_V1.py cat /boot/sources/SQUID_ID.txt"
 
 owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
 mgr = owm.weather_manager()
-observation = mgr.weather_at_place('New York,US')
+observation = mgr.weather_at_place(sys.argv[2])
 
 quantity_temp_sens=7# read from file
 #----------------------------------------------------------
@@ -52,6 +52,7 @@ var=0
 restart=0
 connection_for_data_and_variables=None
 variables_list=[3,3,3,3,3,"0","0"]
+weather_timer=0
 
 bias=16
 last_bias=0
@@ -138,7 +139,8 @@ def System_tick_1_sec():
             read_vars_thread_status=1
             db_thread_status=1
             main=1
-            adc=1
+            adc=
+            weather_timer+=1
             
             MAIN_TIME_LAST=MAIN_TIME_NEXT
             
@@ -1022,8 +1024,13 @@ if __name__ == "__main__":
             
             IO_update()
 
-            w=observation.weather
-            print(w.temperature('celsius'))
+            if weather_timer==60:
+                try:
+                    w=observation.weather
+                    data_wt=w.temperature('fahrenheit')['temp']
+                except BaseException as e:
+                    print(e)
+                weather_timer=0;
 
             if variable_wifipass=="1" and variable_wifiid=="0":
                 
