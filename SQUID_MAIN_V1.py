@@ -1034,7 +1034,7 @@ if __name__ == "__main__":
             
             IO_update()
 
-            if weather_timer==60:
+            if weather_timer==1800:
                 try:
                     w=observation.weather
                     data_wt=w.temperature('fahrenheit')['temp']
@@ -1044,7 +1044,7 @@ if __name__ == "__main__":
 
             if variable_wifipass=="1" and variable_wifiid=="0":
                 
-                GPIO.output(pin_LED_WiFi, GPIO.HIGH)                
+                GPIO.output(pin_LED_WiFi, GPIO.HIGH)
                 set_WiFi=1    
     
                 time.sleep(3)
