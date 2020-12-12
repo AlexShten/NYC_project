@@ -28,7 +28,7 @@ cmd="nice -20 python3 /home/pi/SQUID_MAIN_V1.py cat /boot/sources/SQUID_ID.txt"
 
 owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
 mgr = owm.weather_manager()
-observation = mgr.weather_at_place(sys.argv[2])
+observation = mgr.weather_at_place("New Paltz,US")
 
 quantity_temp_sens=7# read from file
 #----------------------------------------------------------
@@ -472,14 +472,14 @@ def Check_connection():
                 
                 
 def IO_update():
-    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias
+    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end
     
     if variable_all_OFF==0: #all outputs in auto/manual mode
         bias=16
-        if (variable_RT1==0) & (GPIO.input(therm1_stat)==GPIO.HIGH):
+        if (variable_RT1==0) and (GPIO.input(therm1_stat)==GPIO.HIGH):
             GPIO.output(pump_ctrl1, GPIO.HIGH)
             bias|=(1<<3)
-        if (variable_RT1==0) & (GPIO.input(therm1_stat)==GPIO.LOW):
+        if (variable_RT1==0) and (GPIO.input(therm1_stat)==GPIO.LOW):
             GPIO.output(pump_ctrl1, GPIO.LOW)
             bias&=~(1<<3)
         if (variable_RT1==1):
@@ -489,10 +489,10 @@ def IO_update():
             GPIO.output(pump_ctrl1, GPIO.LOW)
             bias&=~(1<<3)
             
-        if (variable_RT2==0) & (GPIO.input(therm2_stat)==GPIO.HIGH):
+        if (variable_RT2==0) and (GPIO.input(therm2_stat)==GPIO.HIGH):
             GPIO.output(pump_ctrl2, GPIO.HIGH)
             bias|=(1<<2)
-        if (variable_RT2==0) & (GPIO.input(therm2_stat)==GPIO.LOW):
+        if (variable_RT2==0) and (GPIO.input(therm2_stat)==GPIO.LOW):
             GPIO.output(pump_ctrl2, GPIO.LOW)
             bias&=~(1<<2)
         if (variable_RT2==1):
@@ -502,10 +502,10 @@ def IO_update():
             GPIO.output(pump_ctrl2, GPIO.LOW)
             bias&=~(1<<2)
             
-        if (variable_RT3==0) & (GPIO.input(therm3_stat)==GPIO.HIGH):
+        if (variable_RT3==0) and (GPIO.input(therm3_stat)==GPIO.HIGH):
             GPIO.output(pump_ctrl3, GPIO.HIGH)
             bias|=(1<<1)
-        if (variable_RT3==0) & (GPIO.input(therm3_stat)==GPIO.LOW):
+        if (variable_RT3==0) and (GPIO.input(therm3_stat)==GPIO.LOW):
             GPIO.output(pump_ctrl3, GPIO.LOW)
             bias&=~(1<<1)
         if (variable_RT3==1):
@@ -514,12 +514,22 @@ def IO_update():
         if (variable_RT3==2):
             GPIO.output(pump_ctrl3, GPIO.LOW)
             bias&=~(1<<1)
-            
+
+        if (variable_BLR == 0) and (GPIO.input(therm1_stat)==GPIO.HIGH or GPIO.input(therm2_stat)==GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
+            GPIO.output(endswitch_ctrl, GPIO.HIGH)
+            data_end=1
+            bias |= (1 << 0)
+        if (variable_BLR == 0) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
+            GPIO.output(endswitch_ctrl, GPIO.LOW)
+            data_end=0
+            bias &= ~(1 << 0)
         if (variable_BLR==1):
             GPIO.output(endswitch_ctrl, GPIO.HIGH)
+            data_end=1
             bias|=(1<<0)
         if (variable_BLR==2):
             GPIO.output(endswitch_ctrl, GPIO.LOW)
+            data_end=0
             bias&=~(1<<0)
             
     if variable_all_OFF==1: #all outputs ON
