@@ -53,7 +53,7 @@ var = 0
 restart = 0
 connection_for_data_and_variables = None
 variables_list = [3, 3, 3, 3, 3, "0", "0"]
-weather_timer = 0
+weather_timer = 2000
 watchdog = 0
 
 bias = 16
