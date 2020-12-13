@@ -25,7 +25,7 @@ server_password = 'Cj75mrwBM2yXgVnnW4ug'
 SN = sys.argv[1]  # "Test_SN_UA"# read from file
 TZ = "UTC"
 path_to_file = "/home/pi/sensorsID.txt"
-cmd = "nice -20 python3 /home/pi/SQUID_MAIN_V1.py cat /boot/sources/SQUID_ID.txt"
+cmd = "reboot"
 
 owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
 mgr = owm.weather_manager()
