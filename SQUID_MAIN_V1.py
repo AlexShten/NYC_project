@@ -317,7 +317,8 @@ def Request_data_to_server():
                 variable_wifiid = variables_list[5]
                 variable_wifipass = variables_list[6]
 
-                data_wt = 0
+                if weather_timer>6:
+                    data_wt = 0
 
                 # write_data_thread_status=0
                 WIFI_LED_ON = 0
