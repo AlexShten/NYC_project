@@ -27,9 +27,7 @@ TZ = "UTC"
 path_to_file = "/home/pi/sensorsID.txt"
 cmd = "reboot"
 
-owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
-mgr = owm.weather_manager()
-observation = mgr.weather_at_place("New Paltz,US")
+
 
 quantity_temp_sens = 7  # read from file
 # ----------------------------------------------------------
@@ -318,6 +316,8 @@ def Request_data_to_server():
 
                 variable_wifiid = variables_list[5]
                 variable_wifipass = variables_list[6]
+
+                data_wt = 0
 
                 # write_data_thread_status=0
                 WIFI_LED_ON = 0
@@ -937,8 +937,11 @@ def Read_temps():
                     data_t7 = None
                 print("Sensor %s not available" % sensors_in_system[6])
 
-        if weather_timer >= 1800:
+        if weather_timer >= 10:
             try:
+                owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
+                mgr = owm.weather_manager()
+                observation = mgr.weather_at_place("New Paltz,US")
                 w = observation.weather
                 data_wt = w.temperature('fahrenheit')['temp']
             except BaseException as e:
