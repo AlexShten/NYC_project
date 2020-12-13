@@ -60,11 +60,11 @@ last_bias = 0
 numbers = 7200
 Quant = 0
 # ---------------------------0-auto, 1-ON, 2-OFF
-variable_RT1 = 2
-variable_RT2 = 2
-variable_RT3 = 2
-variable_BLR = 2
-variable_all_OFF = 2
+variable_RT1 = 0
+variable_RT2 = 0
+variable_RT3 = 0
+variable_BLR = 0
+variable_all_OFF = 0
 variable_wifiid = 0
 variable_wifipass = 0
 # ---------------------------
