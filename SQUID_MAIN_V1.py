@@ -143,7 +143,7 @@ def System_tick_1_sec():
             main = 1
             adc = 1
             weather_timer += 1
-            watchdog+=1
+            watchdog += 1
 
             MAIN_TIME_LAST = MAIN_TIME_NEXT
 
@@ -314,7 +314,7 @@ def Request_data_to_server():
 
                 # write_data_thread_status=0
                 WIFI_LED_ON = 0
-                watchdog=0
+                watchdog = 0
 
 
 #                 print("5")
@@ -492,10 +492,8 @@ def Check_connection():
             except UnboundLocalError as e:
                 retries = 0
 
-        if watchdog > 10 and update==0:
+        if watchdog > 10 and update == 0:
             os.system(cmd)
-
-
 
 
 def IO_update():
@@ -1112,9 +1110,8 @@ if __name__ == "__main__":
                 restart = 1
             if call_Read_temps.is_alive() == False:
                 restart = 1
-            #             if restart==1:
-            #                 os.system(cmd)
-            #                 quit()
+            if restart == 1:
+                os.system(cmd)
 
             main = 0
 
