@@ -50,7 +50,7 @@ WIFI_LED_ON = 1
 var = 0
 restart = 0
 connection_for_data_and_variables = None
-variables_list = [3, 3, 3, 3, 3, "0", "0"]
+variables_list = [0, 0, 0, 0, 0, "0", "0"]
 weather_timer = 2000
 watchdog = 0
 
