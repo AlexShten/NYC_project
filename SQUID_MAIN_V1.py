@@ -1052,6 +1052,7 @@ call_System_tick_1_sec = threading.Thread(target=System_tick_1_sec, args=(), dae
 call_System_tick_05_sec = threading.Thread(target=System_tick_05_sec, args=(), daemon=True)
 
 call_Check_connection = threading.Thread(target=Check_connection, args=(), daemon=True)
+call_Init_WiFi = threading.Thread(target=Init_WiFi, args=(), daemon=True)
 
 call_Request_data_to_server = threading.Thread(target=Request_data_to_server, args=(), daemon=True)
 call_Request_localDB = threading.Thread(target=Request_localDB, args=(), daemon=True)
@@ -1063,7 +1064,8 @@ if __name__ == "__main__":
 
     time.sleep(15)
 
-    Init_WiFi()
+    #Init_WiFi()
+    call_Init_WiFi.start()
 
     call_System_tick_1_sec.start()
     call_System_tick_05_sec.start()
