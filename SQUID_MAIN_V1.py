@@ -54,6 +54,7 @@ restart = 0
 connection_for_data_and_variables = None
 variables_list = [3, 3, 3, 3, 3, "0", "0"]
 weather_timer = 0
+watchdog = 0
 
 bias = 16
 last_bias = 0
@@ -129,7 +130,7 @@ def Print_error(Source, Error):
 
 
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog
 
     MAIN_TIME_LAST = 0
     while True:
@@ -142,6 +143,7 @@ def System_tick_1_sec():
             main = 1
             adc = 1
             weather_timer += 1
+            watchdog+=1
 
             MAIN_TIME_LAST = MAIN_TIME_NEXT
 
@@ -200,7 +202,7 @@ def Create_connection():
 def Request_data_to_server():
     global server_host, server_dbname, server_username, server_password
     global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list, update
-    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries
+    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog
 
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass
 
@@ -219,9 +221,9 @@ def Request_data_to_server():
 
             data_time = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             data_list = (
-            data_sn, data_time, data_zone, data_boilerpumpfunamps, data_ics1, data_ics2, data_ics3, data_boiler,
-            data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_rt1, data_rt2, data_rt3, data_end,
-            data_ps, data_wt)
+                data_sn, data_time, data_zone, data_boilerpumpfunamps, data_ics1, data_ics2, data_ics3, data_boiler,
+                data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_rt1, data_rt2, data_rt3, data_end,
+                data_ps, data_wt)
             # print(data_list)
             if to_db_status == 0 and from_db_status == 0:
                 try:
@@ -312,6 +314,7 @@ def Request_data_to_server():
 
                 # write_data_thread_status=0
                 WIFI_LED_ON = 0
+                watchdog=0
 
 
 #                 print("5")
@@ -331,9 +334,11 @@ def Request_error_to_server():
 
             error_time = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             error_list = (
-            error_sn, error_time, error_boilercurrent, error_ics1, error_ics2, error_ics3, error_t1, error_t2, error_t3,
-            error_t4, error_t5, error_t6, error_t7, error_wt, error_relay1, error_relay2, error_relay3, error_relay4,
-            error_relay5, error_relay6, error_relay7)
+                error_sn, error_time, error_boilercurrent, error_ics1, error_ics2, error_ics3, error_t1, error_t2,
+                error_t3,
+                error_t4, error_t5, error_t6, error_t7, error_wt, error_relay1, error_relay2, error_relay3,
+                error_relay4,
+                error_relay5, error_relay6, error_relay7)
 
             try:
                 connection_for_errors = psycopg2.connect(host=server_host, database=server_dbname, user=server_username,
@@ -468,7 +473,7 @@ def Request_localDB():
 
 def Check_connection():
     global server_host, server_dbname, server_username, server_password
-    global retries, check_thread_status
+    global retries, check_thread_status, watchdog
     while True:
 
         if check_thread_status == 1:
@@ -487,8 +492,11 @@ def Check_connection():
             except UnboundLocalError as e:
                 retries = 0
 
+        print(watchdog)
+        if watchdog > 10:
+            os.system(cmd)
+            quit()
 
-#                 print("ULE")
 
 
 def IO_update():
@@ -537,7 +545,7 @@ def IO_update():
 
         if (variable_BLR == 0) and (
                 GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(
-                therm3_stat) == GPIO.HIGH):
+            therm3_stat) == GPIO.HIGH):
             GPIO.output(endswitch_ctrl, GPIO.HIGH)
             data_end = 1
             bias |= (1 << 0)
@@ -744,9 +752,6 @@ def Search_sens():
             except Exception as ex:
                 Print_error("Open file", ex)
 
-    # print(available_sensors)
-    # print(sensors_in_system)
-
 
 def Read_temps():
     global write_error_thread_status, sensors_in_system, weather_timer
@@ -928,14 +933,13 @@ def Read_temps():
                     data_t7 = None
                 print("Sensor %s not available" % sensors_in_system[6])
 
-        if weather_timer >= 18:
+        if weather_timer >= 1800:
             try:
                 w = observation.weather
                 data_wt = w.temperature('fahrenheit')['temp']
             except BaseException as e:
                 print(e)
             weather_timer = 0
-
 
 
 # def DB_clear():
@@ -988,6 +992,12 @@ def LED_blink(status):
             var = 0
 
 
+def Init_WiFi():
+    if os.popen('iwgetid -r').read() == "":
+        print("start WiFi-connect")
+        os.system('sudo wifi-connect')
+
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -999,10 +1009,10 @@ pin_LED_Power = 27
 
 GPIO.setup(pin_LED_User, GPIO.OUT)
 GPIO.setup(pin_LED_WiFi, GPIO.OUT)
-GPIO.setup(pin_LED_Power, GPIO.OUT)
+# GPIO.setup(pin_LED_Power, GPIO.OUT)
 GPIO.output(pin_LED_User, GPIO.LOW)
 GPIO.output(pin_LED_WiFi, GPIO.LOW)
-GPIO.output(pin_LED_Power, GPIO.HIGH)
+# GPIO.output(pin_LED_Power, GPIO.HIGH)
 
 pump_ctrl1 = 13
 pump_ctrl2 = 5
@@ -1048,9 +1058,7 @@ if __name__ == "__main__":
 
     time.sleep(15)
 
-    if os.popen('iwgetid -r').read() == "":
-        print("start WiFi-connect")
-        os.system('sudo wifi-connect')
+    Init_WiFi()
 
     call_Read_ADCs.start()
     call_Read_temps.start()
@@ -1058,11 +1066,11 @@ if __name__ == "__main__":
     call_System_tick_1_sec.start()
     call_System_tick_05_sec.start()
 
-    #     DB_clear()
-    #     DB_check("start")
+    # DB_clear()
+    # DB_check("start")
     IO_update()
 
-    call_Request_localDB.start()
+    # call_Request_localDB.start()
     time.sleep(1)
     call_Check_connection.start()
     time.sleep(1)
