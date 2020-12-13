@@ -214,7 +214,7 @@ def Request_data_to_server():
 
     while retries < 10:
         pass
-        print("pss")
+
 
     check_thread_status = 0
     connection_for_data_and_variables = None
