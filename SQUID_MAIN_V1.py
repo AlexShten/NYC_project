@@ -130,7 +130,7 @@ def Print_error(Source, Error):
 
 
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog, update, set_WiFi
 
     MAIN_TIME_LAST = 0
     while True:
@@ -143,7 +143,9 @@ def System_tick_1_sec():
             main = 1
             adc = 1
             weather_timer += 1
-            watchdog += 1
+
+            if check_thread_status == 0 and update == 0 and set_WiFi == 0:
+                watchdog += 1
 
             MAIN_TIME_LAST = MAIN_TIME_NEXT
 
@@ -210,6 +212,11 @@ def Request_data_to_server():
     global data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3
     global data_wt, data_end
 
+    while retries < 10:
+        pass
+        print("pss")
+
+    check_thread_status = 0
     connection_for_data_and_variables = None
     Create_connection()
 
@@ -473,7 +480,7 @@ def Request_localDB():
 
 def Check_connection():
     global server_host, server_dbname, server_username, server_password
-    global retries, check_thread_status, watchdog, update
+    global retries, check_thread_status, watchdog
     while True:
 
         if check_thread_status == 1:
@@ -492,7 +499,7 @@ def Check_connection():
             except UnboundLocalError as e:
                 retries = 0
 
-        if watchdog > 10 and update == 0:
+        if watchdog > 10:
             os.system(cmd)
 
 
@@ -1057,11 +1064,11 @@ if __name__ == "__main__":
 
     Init_WiFi()
 
-    call_Read_ADCs.start()
-    call_Read_temps.start()
-
     call_System_tick_1_sec.start()
     call_System_tick_05_sec.start()
+
+    call_Read_ADCs.start()
+    call_Read_temps.start()
 
     # DB_clear()
     # DB_check("start")
@@ -1070,6 +1077,7 @@ if __name__ == "__main__":
     # call_Request_localDB.start()
     time.sleep(1)
     call_Check_connection.start()
+    check_thread_status = 1
     time.sleep(1)
     call_Request_data_to_server.start()
 
