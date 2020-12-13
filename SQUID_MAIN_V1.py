@@ -492,10 +492,9 @@ def Check_connection():
             except UnboundLocalError as e:
                 retries = 0
 
-        print(watchdog)
         if watchdog > 10:
             os.system(cmd)
-            quit()
+
 
 
 
