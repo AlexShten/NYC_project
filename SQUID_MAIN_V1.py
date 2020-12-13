@@ -473,7 +473,7 @@ def Request_localDB():
 
 def Check_connection():
     global server_host, server_dbname, server_username, server_password
-    global retries, check_thread_status, watchdog
+    global retries, check_thread_status, watchdog, update
     while True:
 
         if check_thread_status == 1:
@@ -492,7 +492,7 @@ def Check_connection():
             except UnboundLocalError as e:
                 retries = 0
 
-        if watchdog > 10:
+        if watchdog > 10 and update==0:
             os.system(cmd)
 
 
