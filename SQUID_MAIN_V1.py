@@ -1102,8 +1102,8 @@ if __name__ == "__main__":
                 restart = 1
             if call_Request_data_to_server.is_alive() == False:
                 restart = 1
-            if call_Request_localDB.is_alive() == False:
-                restart = 1
+            # if call_Request_localDB.is_alive() == False:
+            #     restart = 1
             if call_Check_connection.is_alive() == False:
                 restart = 1
             if call_Read_ADCs.is_alive() == False:
