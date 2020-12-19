@@ -54,8 +54,7 @@ watchdog = 0
 
 reset_temp_repeat = 0
 
-#wait_times = [300, 600, 900, 1800, 3600]
-wait_times = [30, 60, 90, 120, 150]
+wait_times = [60, 60, 900, 1800, 3600]
 wait_wifi = 0
 wifi_recconnect_repeat = 0
 wifi_recconnect_flag = 0
@@ -1142,13 +1141,6 @@ call_Read_ADCs = threading.Thread(target=Read_ADCs, args=(), daemon=True)
 call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 
 if __name__ == "__main__":
-
-    if os.path.exists("/home/pi/wifi_recconnect.txt"):
-        pass
-    else:
-        file = open("/home/pi/wifi_recconnect.txt", "w")
-        file.write("0")
-        file.close()
 
     time.sleep(15)
 
