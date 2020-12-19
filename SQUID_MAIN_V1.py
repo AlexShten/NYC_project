@@ -54,6 +54,12 @@ watchdog = 0
 
 reset_temp_repeat = 0
 
+#wait_times = [300, 600, 900, 1800, 3600]
+wait_times = [30, 60, 90, 120, 150]
+wait_wifi = 0
+wifi_recconnect_repeat = 0
+wifi_recconnect_flag = 0
+
 bias = 16
 last_bias = 0
 
@@ -128,7 +134,7 @@ def Print_error(Source, Error):
 
 
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog, update, set_WiFi
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog, update, set_WiFi, wifi_recconnect_flag, wait_wifi
 
     MAIN_TIME_LAST = 0
     while True:
@@ -141,6 +147,9 @@ def System_tick_1_sec():
             main = 1
             adc = 1
             weather_timer += 1
+
+            if wifi_recconnect_flag == 1:
+                wait_wifi += 1
 
             if check_thread_status == 0 and update == 0 and set_WiFi == 0:
                 watchdog += 1
@@ -514,6 +523,8 @@ def Check_connection():
             os.system(cmd)
 
 
+
+
 def IO_update():
     global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end, reset_temp_repeat
 
@@ -615,7 +626,7 @@ def IO_update():
     if reset_temp_repeat > 5:
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
-            os.system('reboot')
+            os.system(cmd)
 
     if last_bias != bias:
         try:
@@ -667,7 +678,7 @@ def Update_source():
 
     os.system(
         'curl -L https://raw.githubusercontent.com/AlexShten/NYC_project/main/SQUID_MAIN_V1.py -o /home/pi/GitHub_source/SQUID_MAIN_V1.py')
-    os.system('reboot')
+    os.system(cmd)
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -1046,9 +1057,28 @@ def LED_blink(status):
 
 
 def Init_WiFi():
+    global wifi_recconnect_flag, wifi_recconnect_repeat
+
+    wifi_recconnect_flag = 1
+    try:
+        file = open("/home/pi/wifi_recconnect.txt", "r")
+        wifi_recconnect_repeat = int(file.read())
+        file.close()
+    except:
+        wifi_recconnect_repeat = 4
+
     if os.popen('iwgetid -r').read() == "":
         print("start WiFi-connect")
         os.system('sudo wifi-connect')
+
+    try:
+        file = open("/home/pi/wifi_recconnect.txt", "w")
+        file.write("0")
+        file.close()
+    except:
+        pass
+
+    wifi_recconnect_flag = 0
 
 
 GPIO.setmode(GPIO.BCM)
@@ -1113,6 +1143,13 @@ call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 
 if __name__ == "__main__":
 
+    if os.path.exists("/home/pi/wifi_recconnect.txt"):
+        pass
+    else:
+        file = open("/home/pi/wifi_recconnect.txt", "w")
+        file.write("0")
+        file.close()
+
     time.sleep(15)
 
     # Init_WiFi()
@@ -1139,6 +1176,22 @@ if __name__ == "__main__":
         if main == 1:
 
             IO_update()
+
+            if wait_wifi > wait_times[wifi_recconnect_repeat]:
+
+                wifi_recconnect_repeat += 1
+
+                if wifi_recconnect_repeat > 4:
+                    wifi_recconnect_repeat = 4
+
+                try:
+                    file = open("/home/pi/wifi_recconnect.txt", "w")
+                    file.write(str(wifi_recconnect_repeat))
+                    file.close()
+                except:
+                    pass
+
+                os.system(cmd)
 
             if variable_wifipass == "1" and variable_wifiid == "0":
                 GPIO.output(pin_LED_WiFi, GPIO.HIGH)
