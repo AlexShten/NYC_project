@@ -50,7 +50,7 @@ WIFI_LED_ON = 1
 var = 0
 restart = 0
 connection_for_data_and_variables = None
-variables_list = [0, 0, 0, 0, 0, "0", "0"]
+variables_list = [2, 2, 2, 2, 2, "0", "0"]
 weather_timer = 2000
 watchdog = 0
 
@@ -59,12 +59,12 @@ last_bias = 0
 
 numbers = 7200
 Quant = 0
-# ---------------------------0-auto, 1-ON, 2-OFF
-variable_RT1 = 0
-variable_RT2 = 0
-variable_RT3 = 0
-variable_BLR = 0
-variable_all_OFF = 0
+# ---------------------------2-auto, 1-ON, 0-OFF
+variable_RT1 = 2
+variable_RT2 = 2
+variable_RT3 = 2
+variable_BLR = 2
+variable_all_OFF = 2
 variable_wifiid = 0
 variable_wifipass = 0
 # ---------------------------
@@ -194,9 +194,10 @@ def Create_connection():
         #                 DB_switch_EXTERNAL_LOCAL()
         #                 print("else1")
         except psycopg2.OperationalError as e:
-            Print_error("Connection create error", e)
+            pass
+            #Print_error("Connection create error", e)
             # DB_switch_EXTERNAL_LOCAL()
-            print("else2")
+            #print("else2")
 
 
 def Request_data_to_server():
@@ -241,9 +242,11 @@ def Request_data_to_server():
                             icsboiler, t1, t2, t3, t4, t5, t6, t7, rt1, rt2, rt3, endswitch, ps, weather) \
                             VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);', data_list)
                     except psycopg2.DatabaseError as e:
-                        print("cursor.execute1")
+                        pass
+                        #print("cursor.execute1")
                     except NameError as e:
-                        print(e)
+                        pass
+                        #print(e)
 
                     try:
                         #                         print("2")
@@ -251,15 +254,17 @@ def Request_data_to_server():
                         #                         print("---------")
                         connection_for_data_and_variables.commit()
                     except psycopg2.DatabaseError as e:
-                        print("connection.commit")
+                        pass
+                        #print("connection.commit")
                     except AttributeError as e:
-                        print(e)
+                        pass
+                        #print(e)
                 except psycopg2.InterfaceError as e:
                     if connection_for_data_and_variables: connection_for_data_and_variables.close()
                     connection_for_data_and_variables = None
                     # DB_switch_EXTERNAL_LOCAL()
                     Create_connection()
-                    Print_error("Insert step error", e)
+                    #Print_error("Insert step error", e)
 
                 try:
                     try:
@@ -269,24 +274,28 @@ def Request_data_to_server():
                         cursor.execute('SELECT rt1, rt2, rt3, blr, allof, wifiid, wifipass FROM devicevariables \
                             WHERE sn=%s ORDER BY id DESC LIMIT 1;', (SN,))
                     except psycopg2.DatabaseError as e:
-                        print("cursor.execute2")
+                        pass
+                        #print("cursor.execute2")
                     except NameError as e:
-                        print(e)
+                        pass
+                        #print(e)
                     try:
                         #                         print("4")
                         #                         print(time.perf_counter())
                         #                         print("---------")
                         variables_list = cursor.fetchone()
                     except psycopg2.DatabaseError as e:
-                        print("cursor.fetchone")
+                        pass
+                        #print("cursor.fetchone")
                     except NameError as e:
-                        print(e)
+                        pass
+                        #print(e)
                 except psycopg2.InterfaceError as e:
                     if connection_for_data_and_variables: connection_for_data_and_variables.close()
                     connection_for_data_and_variables = None
                     # DB_switch_EXTERNAL_LOCAL()
                     Create_connection()
-                    Print_error("Select step error", e)
+                    #Print_error("Select step error", e)
 
                 # 0-auto, 1-on, 2-off
                 if variables_list[0] == 0 or variables_list[0] == 1 or variables_list[0] == 2:
@@ -356,7 +365,8 @@ def Request_error_to_server():
                 connection_for_errors.commit()
                 write_error_thread_status = write_error_thread_status + 1
             except psycopg2.DatabaseError as e:
-                Print_error("Server DB to trouble error", e)
+                pass
+                #Print_error("Server DB to trouble error", e)
             finally:
                 if connection_for_errors: connection_for_errors.close()
 
@@ -382,7 +392,7 @@ def Request_localDB():
                         data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3,
                         data_boiler, data_wt)
                 #                 try:
-                print(data)
+                #print(data)
                 cursor_to_db.execute(sql, data)
                 connection_to_db.commit()
                 #                 except Exception as e:
@@ -401,7 +411,8 @@ def Request_localDB():
                         Quant)
                     cursor_to_db_read.execute(text)
                 except Exception as e:
-                    Print_error("Data_from_DB_1", e)
+                    pass
+                    #Print_error("Data_from_DB_1", e)
                 try:
                     res = cursor_to_db_read.fetchall()
 
@@ -445,14 +456,16 @@ def Request_localDB():
 
                         i = 0
                         while i != 2:
-                            print(i)
+                            pass
+                            #print(i)
                             # i=DB_clear()
 
                         main_db_data_list.clear()
                         from_db_status = 0
 
                     except psycopg2.DatabaseError as e:
-                        Print_error("Post_DB_Data", e)
+                        pass
+                        #Print_error("Post_DB_Data", e)
                         to_db_status = 1
                         from_db_status = 0
                         check_thread_status = 1
@@ -463,7 +476,8 @@ def Request_localDB():
                         if connection_to_server_db: connection_to_server_db.close()
 
                 except Exception as e:
-                    Print_error("Data_from_DB_2", e)
+                    pass
+                    #Print_error("Data_from_DB_2", e)
                     # time_stamp=inner_db_data_list[1]
                 # inner_db_data_list[1]=(datetime.strptime(time_stamp,"%m/%d/%Y %H:%M:%S")+timedelta(seconds=1)).strftime("%m/%d/%Y %H:%M:%S")
                 # inner_db_data_list_copy=inner_db_data_list.copy()
@@ -504,55 +518,52 @@ def Check_connection():
 def IO_update():
     global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end
 
-    if variable_all_OFF == 0:  # all outputs in auto/manual mode
+    if variable_all_OFF == 2:  # all outputs in auto/manual mode
         bias = 16
-        if (variable_RT1 == 0) and (GPIO.input(therm1_stat) == GPIO.HIGH):
+        if (variable_RT1 == 2) and (GPIO.input(therm1_stat) == GPIO.HIGH):
             GPIO.output(pump_ctrl1, GPIO.HIGH)
             bias |= (1 << 3)
-        if (variable_RT1 == 0) and (GPIO.input(therm1_stat) == GPIO.LOW):
+        if (variable_RT1 == 2) and (GPIO.input(therm1_stat) == GPIO.LOW):
             GPIO.output(pump_ctrl1, GPIO.LOW)
             bias &= ~(1 << 3)
         if (variable_RT1 == 1):
             GPIO.output(pump_ctrl1, GPIO.HIGH)
             bias |= (1 << 3)
-        if (variable_RT1 == 2):
+        if (variable_RT1 == 0):
             GPIO.output(pump_ctrl1, GPIO.LOW)
             bias &= ~(1 << 3)
 
-        if (variable_RT2 == 0) and (GPIO.input(therm2_stat) == GPIO.HIGH):
+        if (variable_RT2 == 2) and (GPIO.input(therm2_stat) == GPIO.HIGH):
             GPIO.output(pump_ctrl2, GPIO.HIGH)
             bias |= (1 << 2)
-        if (variable_RT2 == 0) and (GPIO.input(therm2_stat) == GPIO.LOW):
+        if (variable_RT2 == 2) and (GPIO.input(therm2_stat) == GPIO.LOW):
             GPIO.output(pump_ctrl2, GPIO.LOW)
             bias &= ~(1 << 2)
         if (variable_RT2 == 1):
             GPIO.output(pump_ctrl2, GPIO.HIGH)
             bias |= (1 << 2)
-        if (variable_RT2 == 2):
+        if (variable_RT2 == 0):
             GPIO.output(pump_ctrl2, GPIO.LOW)
             bias &= ~(1 << 2)
 
-        if (variable_RT3 == 0) and (GPIO.input(therm3_stat) == GPIO.HIGH):
+        if (variable_RT3 == 2) and (GPIO.input(therm3_stat) == GPIO.HIGH):
             GPIO.output(pump_ctrl3, GPIO.HIGH)
             bias |= (1 << 1)
-        if (variable_RT3 == 0) and (GPIO.input(therm3_stat) == GPIO.LOW):
+        if (variable_RT3 == 2) and (GPIO.input(therm3_stat) == GPIO.LOW):
             GPIO.output(pump_ctrl3, GPIO.LOW)
             bias &= ~(1 << 1)
         if (variable_RT3 == 1):
             GPIO.output(pump_ctrl3, GPIO.HIGH)
             bias |= (1 << 1)
-        if (variable_RT3 == 2):
+        if (variable_RT3 == 0):
             GPIO.output(pump_ctrl3, GPIO.LOW)
             bias &= ~(1 << 1)
 
-        if (variable_BLR == 0) and (
-                GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(
-            therm3_stat) == GPIO.HIGH):
+        if (variable_BLR == 2) and (GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
             GPIO.output(endswitch_ctrl, GPIO.HIGH)
             data_end = 1
             bias |= (1 << 0)
-        if (variable_BLR == 0) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (
-                GPIO.input(therm3_stat) == GPIO.LOW):
+        if (variable_BLR == 2) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
             GPIO.output(endswitch_ctrl, GPIO.LOW)
             data_end = 0
             bias &= ~(1 << 0)
@@ -560,7 +571,7 @@ def IO_update():
             GPIO.output(endswitch_ctrl, GPIO.HIGH)
             data_end = 1
             bias |= (1 << 0)
-        if (variable_BLR == 2):
+        if (variable_BLR == 0):
             GPIO.output(endswitch_ctrl, GPIO.LOW)
             data_end = 0
             bias &= ~(1 << 0)
@@ -572,7 +583,7 @@ def IO_update():
         GPIO.output(endswitch_ctrl, GPIO.HIGH)
         bias = 31
 
-    if variable_all_OFF == 2:  # all outputs OFF
+    if variable_all_OFF == 0:  # all outputs OFF
         GPIO.output(pump_ctrl1, GPIO.LOW)
         GPIO.output(pump_ctrl2, GPIO.LOW)
         GPIO.output(pump_ctrl3, GPIO.LOW)
@@ -599,7 +610,8 @@ def IO_update():
             tmp = bus.read_i2c_block_data(address, bias)
             last_bias = bias
         except BaseException:
-            print("bias error")
+            pass
+            #print("bias error")
 
 
 def Reset_WiFi():
@@ -659,42 +671,48 @@ def Read_ADCs():
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics1 = round(number, 2)
             except BaseException:
-                print("data_pump1 error")
+                pass
+                #print("data_pump1 error")
 
             try:
                 tmp = bus.read_i2c_block_data(address, 2)  # read channel 2 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics2 = round(number, 2)
             except BaseException:
-                print("data_pump2 error")
+                pass
+                #print("data_pump2 error")
 
             try:
                 tmp = bus.read_i2c_block_data(address, 3)  # read channel 3 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics3 = round(number, 2)
             except BaseException:
-                print("data_pump3 error")
+                pass
+                #print("data_pump3 error")
 
             try:
                 tmp = bus.read_i2c_block_data(address, 4)  # read channel 4 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_boiler = round(number, 2)
             except BaseException:
-                print("data_boiler error")
+                pass
+                #print("data_boiler error")
 
             try:
                 tmp = bus.read_i2c_block_data(address, 5)  # read channel 5 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_boilerpumpfunamps = round(number, 2)
             except BaseException:
-                print("data_common error")
+                pass
+                #print("data_common error")
 
             try:
                 tmp = bus.read_i2c_block_data(address, 6)  # read channel 6 from arduino
                 number = (tmp[0] + tmp[1] * 256) * 0.17
                 data_ps = round(number, 2)
             except BaseException:
-                print("data_PS error")
+                pass
+                #print("data_PS error")
 
             adc = 0
 
@@ -719,7 +737,8 @@ def Search_sens():
                 # sensor.set_resolution(10, persist=True)
                 i = i + 1
         except BaseException as e:
-            print(e)
+            pass
+            #print(e)
 
         equality = 0
         for step1 in range(quantity_temp_sens):
@@ -748,11 +767,13 @@ def Search_sens():
                     for step4 in range(quantity_temp_sens):
                         write_in_file.write(sensors_in_system[step4] + "\n")
                 except Exception as e:
-                    Print_error("Write to file", e)
+                    pass
+                    #Print_error("Write to file", e)
                 finally:
                     write_in_file.close()
             except Exception as ex:
-                Print_error("Open file", ex)
+                pass
+                #Print_error("Open file", ex)
 
 
 def Read_temps():
@@ -779,7 +800,8 @@ def Read_temps():
                 sensor1 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[0])
                 sensor1_ready = True
             except Exception as e:
-                Print_error("sens1", e)
+                pass
+                #Print_error("sens1", e)
 
         if sensor1_ready == True:
             try:
@@ -795,14 +817,16 @@ def Read_temps():
                     sensor1_error = 0
                     write_error_thread_status = 0
                     data_t1 = None
-                print("Sensor %s not available" % sensors_in_system[0])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[0])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[1] != None and sensor2_ready == False:
             try:
                 sensor2 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[1])
                 sensor2_ready = True
             except Exception as e:
-                Print_error("sens2", e)
+                pass
+                #Print_error("sens2", e)
 
         if sensor2_ready == True:
             try:
@@ -818,14 +842,16 @@ def Read_temps():
                     sensor2_error = 0
                     write_error_thread_status = 0
                     data_t2 = None
-                print("Sensor %s not available" % sensors_in_system[1])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[1])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[2] != None and sensor3_ready == False:
             try:
                 sensor3 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[2])
                 sensor3_ready = True
             except Exception as e:
-                Print_error("sens3", e)
+                pass
+                #Print_error("sens3", e)
 
         if sensor3_ready == True:
             try:
@@ -841,14 +867,16 @@ def Read_temps():
                     sensor3_error = 0
                     write_error_thread_status = 0
                     data_t3 = None
-                print("Sensor %s not available" % sensors_in_system[2])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[2])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[3] != None and sensor4_ready == False:
             try:
                 sensor4 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[3])
                 sensor4_ready = True
             except Exception as e:
-                Print_error("sens4", e)
+                pass
+                #Print_error("sens4", e)
 
         if sensor4_ready == True:
             try:
@@ -864,14 +892,16 @@ def Read_temps():
                     sensor4_error = 0
                     write_error_thread_status = 0
                     data_t4 = None
-                print("Sensor %s not available" % sensors_in_system[3])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[3])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[4] != None and sensor5_ready == False:
             try:
                 sensor5 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[4])
                 sensor5_ready = True
             except Exception as e:
-                Print_error("sens5", e)
+                pass
+                #Print_error("sens5", e)
 
         if sensor5_ready == True:
             try:
@@ -887,14 +917,16 @@ def Read_temps():
                     sensor5_error = 0
                     write_error_thread_status = 0
                     data_t5 = None
-                print("Sensor %s not available" % sensors_in_system[4])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[4])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[5] != None and sensor6_ready == False:
             try:
                 sensor6 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[5])
                 sensor6_ready = True
             except Exception as e:
-                Print_error("sens6", e)
+                pass
+                #Print_error("sens6", e)
 
         if sensor6_ready == True:
             try:
@@ -910,14 +942,16 @@ def Read_temps():
                     sensor6_error = 0
                     write_error_thread_status = 0
                     data_t6 = None
-                print("Sensor %s not available" % sensors_in_system[5])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[5])
         # ------------------------------------------------------------------------------------------------
         if sensors_in_system[6] != None and sensor7_ready == False:
             try:
                 sensor7 = W1ThermSensor(W1ThermSensor.THERM_SENSOR_DS18B20, sensors_in_system[6])
                 sensor7_ready = True
             except Exception as e:
-                Print_error("sens7", e)
+                pass
+                #Print_error("sens7", e)
 
         if sensor7_ready == True:
             try:
@@ -933,7 +967,8 @@ def Read_temps():
                     sensor7_error = 0
                     write_error_thread_status = 0
                     data_t7 = None
-                print("Sensor %s not available" % sensors_in_system[6])
+                pass
+                #print("Sensor %s not available" % sensors_in_system[6])
 
         if weather_timer >= 1800:
             try:
@@ -943,7 +978,8 @@ def Read_temps():
                 w = observation.weather
                 data_wt = w.temperature('fahrenheit')['temp']
             except BaseException as e:
-                print(e)
+                pass
+                #print(e)
             weather_timer = 0
 
 
