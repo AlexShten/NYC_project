@@ -180,11 +180,11 @@ def DB_switch_EXTERNAL_LOCAL():
     to_db_status = 1
     check_thread_status = 1
     WIFI_LED_ON = 1
-    variable_RT1 = 0  # auto
-    variable_RT2 = 0  # auto
-    variable_RT3 = 0  # auto
+    variable_RT1 = 2  # auto
+    variable_RT2 = 2  # auto
+    variable_RT3 = 2  # auto
     variable_BLR = 1  # on
-    variable_all_OFF = 0  # auto
+    variable_all_OFF = 2  # auto
 
 
 def Create_connection():
@@ -526,6 +526,9 @@ def Check_connection():
 
 def IO_update():
     global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end, reset_temp_repeat
+    flag_rt1 = 0
+    flag_rt2 = 0
+    flag_rt3 = 0
 
     if variable_all_OFF == 2:  # all outputs in auto/manual mode
         bias = 16
@@ -602,20 +605,32 @@ def IO_update():
         GPIO.output(endswitch_ctrl, GPIO.LOW)
         bias = 16
 
-    if GPIO.input(therm1_stat) == GPIO.HIGH:
+    if flag_rt1 == 0 and GPIO.input(therm1_stat) == GPIO.HIGH:
         data_rt1 = 1
-    if GPIO.input(therm1_stat) == GPIO.LOW:
+        flag_rt1 = 1
+        Send_therm_state(1, 1)
+    if flag_rt1 == 1 and GPIO.input(therm1_stat) == GPIO.LOW:
         data_rt1 = 0
+        flag_rt1 = 0
+        Send_therm_state(1, 0)
 
-    if GPIO.input(therm2_stat) == GPIO.HIGH:
+    if flag_rt2 == 0 and GPIO.input(therm2_stat) == GPIO.HIGH:
         data_rt2 = 1
-    if GPIO.input(therm2_stat) == GPIO.LOW:
+        flag_rt2 = 1
+        Send_therm_state(2, 1)
+    if flag_rt2 == 1 and GPIO.input(therm2_stat) == GPIO.LOW:
         data_rt2 = 0
+        flag_rt2 = 0
+        Send_therm_state(2, 0)
 
-    if GPIO.input(therm3_stat) == GPIO.HIGH:
+    if flag_rt3 == 0 and GPIO.input(therm3_stat) == GPIO.HIGH:
         data_rt3 = 1
-    if GPIO.input(therm3_stat) == GPIO.LOW:
+        flag_rt3 = 1
+        Send_therm_state(3, 1)
+    if flag_rt3 == 1 and GPIO.input(therm3_stat) == GPIO.LOW:
         data_rt3 = 0
+        flag_rt3 = 0
+        Send_therm_state(3, 0)
 
     if GPIO.input(reset_temp) == GPIO.HIGH:
         reset_temp_repeat += 1
@@ -1078,6 +1093,29 @@ def Init_WiFi():
         pass
 
     wifi_recconnect_flag = 0
+
+
+def Send_therm_state(_tnumb, _state):
+    global SN, server_host, server_dbname, server_username, server_password, write_data_thread_status, set_WiFi, update
+
+    timestamp = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
+    data = [SN, timestamp, _tnumb, _state]
+
+    if write_data_thread_status == 1 and set_WiFi == 0 and update == 0:
+
+        try:
+            conn = psycopg2.connect(host=server_host, database=server_dbname, user=server_username, password=server_password, connect_timeout=2)
+            if conn != None:
+                cur = conn.cursor()
+
+                cur.execute('INSERT INTO devicethermostats (sn, time, rt, state) VALUES(%s,%s,%s,%s);', data)
+                conn.commit()
+                if conn:
+                    conn.close()
+
+        except psycopg2.OperationalError as e:
+            pass
+
 
 
 GPIO.setmode(GPIO.BCM)
