@@ -62,6 +62,10 @@ wifi_recconnect_flag = 0
 bias = 16
 last_bias = 0
 
+flag_rt1 = 0
+flag_rt2 = 0
+flag_rt3 = 0
+
 numbers = 7200
 Quant = 0
 # ---------------------------2-auto, 1-ON, 0-OFF
@@ -526,9 +530,7 @@ def Check_connection():
 
 def IO_update():
     global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end, reset_temp_repeat
-    flag_rt1 = 0
-    flag_rt2 = 0
-    flag_rt3 = 0
+    global flag_rt1, flag_rt2, flag_rt3
 
     if variable_all_OFF == 2:  # all outputs in auto/manual mode
         bias = 16
@@ -605,11 +607,11 @@ def IO_update():
         GPIO.output(endswitch_ctrl, GPIO.LOW)
         bias = 16
 
-    if flag_rt1 == 0 and GPIO.input(therm1_stat) == GPIO.HIGH:
+    if (flag_rt1 == 0) and (GPIO.input(therm1_stat) == GPIO.HIGH):
         data_rt1 = 1
         flag_rt1 = 1
         Send_therm_state(1, 1)
-    if flag_rt1 == 1 and GPIO.input(therm1_stat) == GPIO.LOW:
+    if (flag_rt1 == 1) and (GPIO.input(therm1_stat) == GPIO.LOW):
         data_rt1 = 0
         flag_rt1 = 0
         Send_therm_state(1, 0)
