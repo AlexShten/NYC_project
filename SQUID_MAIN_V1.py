@@ -311,27 +311,27 @@ def Request_data_to_server():
                 if variables_list[0] == 0 or variables_list[0] == 1 or variables_list[0] == 2:
                     variable_RT1 = variables_list[0]
                 else:
-                    variable_RT1 = 0  # auto
+                    variable_RT1 = 2  # auto
 
                 if variables_list[1] == 0 or variables_list[1] == 1 or variables_list[1] == 2:
                     variable_RT2 = variables_list[1]
                 else:
-                    variable_RT2 = 0  # auto
+                    variable_RT2 = 2  # auto
 
                 if variables_list[2] == 0 or variables_list[2] == 1 or variables_list[2] == 2:
                     variable_RT3 = variables_list[2]
                 else:
-                    variable_RT3 = 0  # auto
+                    variable_RT3 = 2  # auto
 
                 if variables_list[3] == 0 or variables_list[3] == 1 or variables_list[3] == 2:
                     variable_BLR = variables_list[3]
                 else:
-                    variable_BLR = 1  # on
+                    variable_BLR = 2  # on
 
                 if variables_list[4] == 0 or variables_list[4] == 1 or variables_list[4] == 2:
                     variable_all_OFF = variables_list[4]
                 else:
-                    variable_all_OFF = 0  # auto
+                    variable_all_OFF = 2  # auto
 
                 variable_wifiid = variables_list[5]
                 variable_wifipass = variables_list[6]
