@@ -62,9 +62,8 @@ wifi_recconnect_flag = 0
 bias = 16
 last_bias = 0
 
-flag_rt1 = 0
-flag_rt2 = 0
-flag_rt3 = 0
+therm_bits = 0
+
 
 numbers = 7200
 Quant = 0
@@ -215,7 +214,7 @@ def Create_connection():
 def Request_data_to_server():
     global server_host, server_dbname, server_username, server_password
     global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list, update
-    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog
+    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog, therm_bits
 
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass
 
@@ -336,6 +335,52 @@ def Request_data_to_server():
 
                 variable_wifiid = variables_list[5]
                 variable_wifipass = variables_list[6]
+
+                if therm_bits > 0:
+
+                    if (therm_bits & 1) == 1:
+                        _tnumb = 1
+                        _state = 1
+                    elif (therm_bits & 10) == 2:
+                        _tnumb = 1
+                        _state = 0
+                    elif (therm_bits & 100) == 4:
+                        _tnumb = 2
+                        _state = 1
+                    elif (therm_bits & 1000) == 8:
+                        _tnumb = 2
+                        _state = 0
+                    elif (therm_bits & 10000) == 16:
+                        _tnumb = 3
+                        _state = 1
+                    elif (therm_bits & 100000) == 32:
+                        _tnumb = 3
+                        _state = 0
+
+                    timestamp = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
+                    data = [SN, timestamp, _tnumb, _state]
+
+                    try:
+                        cursor.execute(
+                            'INSERT INTO devicethermostats (sn, time, rt, state) VALUES(%s,%s,%s,%s);',
+                            data)
+                        connection_for_data_and_variables.commit()
+
+                        if _tnumb == 1 and _state == 1:
+                            therm_bits &= ~(1 << 0)
+                        elif _tnumb == 1 and _state == 0:
+                            therm_bits &= ~(1 << 1)
+                        elif _tnumb == 2 and _state == 1:
+                            therm_bits &= ~(1 << 2)
+                        elif _tnumb == 2 and _state == 0:
+                            therm_bits &= ~(1 << 3)
+                        elif _tnumb == 3 and _state == 1:
+                            therm_bits &= ~(1 << 4)
+                        elif _tnumb == 3 and _state == 0:
+                            therm_bits &= ~(1 << 5)
+
+                    except psycopg2.OperationalError as e:
+                        pass
 
                 # write_data_thread_status=0
                 WIFI_LED_ON = 0
@@ -529,8 +574,7 @@ def Check_connection():
 
 
 def IO_update():
-    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, data_end, reset_temp_repeat
-    global flag_rt1, flag_rt2, flag_rt3
+    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, data_end, reset_temp_repeat
 
     if variable_all_OFF == 2:  # all outputs in auto/manual mode
         bias = 16
@@ -607,32 +651,26 @@ def IO_update():
         GPIO.output(endswitch_ctrl, GPIO.LOW)
         bias = 16
 
-    if (flag_rt1 == 0) and (GPIO.input(therm1_stat) == GPIO.HIGH):
+    if data_rt1 == 0 and (GPIO.input(therm1_stat) == GPIO.HIGH):
         data_rt1 = 1
-        flag_rt1 = 1
-        Send_therm_state(1, 1)
-    if (flag_rt1 == 1) and (GPIO.input(therm1_stat) == GPIO.LOW):
+        therm_bits |= (1 << 0)
+    if data_rt1 == 1 and (GPIO.input(therm1_stat) == GPIO.LOW):
         data_rt1 = 0
-        flag_rt1 = 0
-        Send_therm_state(1, 0)
+        therm_bits |= (1 << 1)
 
-    if flag_rt2 == 0 and GPIO.input(therm2_stat) == GPIO.HIGH:
+    if data_rt2 == 0 and GPIO.input(therm2_stat) == GPIO.HIGH:
         data_rt2 = 1
-        flag_rt2 = 1
-        Send_therm_state(2, 1)
-    if flag_rt2 == 1 and GPIO.input(therm2_stat) == GPIO.LOW:
+        therm_bits |= (1 << 2)
+    if data_rt2 == 1 and GPIO.input(therm2_stat) == GPIO.LOW:
         data_rt2 = 0
-        flag_rt2 = 0
-        Send_therm_state(2, 0)
+        therm_bits |= (1 << 3)
 
-    if flag_rt3 == 0 and GPIO.input(therm3_stat) == GPIO.HIGH:
+    if data_rt3 == 0 and GPIO.input(therm3_stat) == GPIO.HIGH:
         data_rt3 = 1
-        flag_rt3 = 1
-        Send_therm_state(3, 1)
-    if flag_rt3 == 1 and GPIO.input(therm3_stat) == GPIO.LOW:
+        therm_bits |= (1 << 4)
+    if data_rt3 == 1 and GPIO.input(therm3_stat) == GPIO.LOW:
         data_rt3 = 0
-        flag_rt3 = 0
-        Send_therm_state(3, 0)
+        therm_bits |= (1 << 5)
 
     if GPIO.input(reset_temp) == GPIO.HIGH:
         reset_temp_repeat += 1
@@ -1095,29 +1133,6 @@ def Init_WiFi():
         pass
 
     wifi_recconnect_flag = 0
-
-
-def Send_therm_state(_tnumb, _state):
-    global SN, server_host, server_dbname, server_username, server_password, write_data_thread_status, set_WiFi, update
-
-    timestamp = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
-    data = [SN, timestamp, _tnumb, _state]
-
-    if write_data_thread_status == 1 and set_WiFi == 0 and update == 0:
-
-        try:
-            conn = psycopg2.connect(host=server_host, database=server_dbname, user=server_username, password=server_password, connect_timeout=2)
-            if conn != None:
-                cur = conn.cursor()
-
-                cur.execute('INSERT INTO devicethermostats (sn, time, rt, state) VALUES(%s,%s,%s,%s);', data)
-                conn.commit()
-                if conn:
-                    conn.close()
-
-        except psycopg2.OperationalError as e:
-            pass
-
 
 
 GPIO.setmode(GPIO.BCM)
