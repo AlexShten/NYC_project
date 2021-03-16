@@ -49,6 +49,7 @@ var = 0
 restart = 0
 connection_for_data_and_variables = None
 variables_list = [2, 2, 2, 2, 2, "0", "0"]
+variables_list_old = [2, 2, 2, 2, 2]
 weather_timer = 2000
 watchdog = 0
 
@@ -310,31 +311,31 @@ def Request_data_to_server():
                     Create_connection()
                     # Print_error("Select step error", e)
 
-                # 0-auto, 1-on, 2-off
-                if variables_list[0] in correct_variables:
-                    variable_RT1 = variables_list[0]
-                else:
-                    variable_RT1 = 2  # auto
-
-                if variables_list[1] in correct_variables:
-                    variable_RT2 = variables_list[1]
-                else:
-                    variable_RT2 = 2  # auto
-
-                if variables_list[2] in correct_variables:
-                    variable_RT3 = variables_list[2]
-                else:
-                    variable_RT3 = 2  # auto
-
-                if variables_list[3] in correct_variables:
-                    variable_BLR = variables_list[3]
-                else:
-                    variable_BLR = 2  # on
-
-                if variables_list[4] in correct_variables:
-                    variable_all_OFF = variables_list[4]
-                else:
-                    variable_all_OFF = 2  # auto
+                # # 0-auto, 1-on, 2-off
+                # if variables_list[0] in correct_variables:
+                #     variable_RT1 = variables_list[0]
+                # else:
+                #     variable_RT1 = 2  # auto
+                #
+                # if variables_list[1] in correct_variables:
+                #     variable_RT2 = variables_list[1]
+                # else:
+                #     variable_RT2 = 2  # auto
+                #
+                # if variables_list[2] in correct_variables:
+                #     variable_RT3 = variables_list[2]
+                # else:
+                #     variable_RT3 = 2  # auto
+                #
+                # if variables_list[3] in correct_variables:
+                #     variable_BLR = variables_list[3]
+                # else:
+                #     variable_BLR = 2  # on
+                #
+                # if variables_list[4] in correct_variables:
+                #     variable_all_OFF = variables_list[4]
+                # else:
+                #     variable_all_OFF = 2  # auto
 
                 variable_wifiid = variables_list[5]
                 variable_wifipass = variables_list[6]
@@ -395,8 +396,7 @@ def Request_data_to_server():
 
                     try:
                         cursor.execute(
-                            'INSERT INTO devicezonestatus (sn, time, type, rt, state) VALUES(%s,%s,%s,%s,%s);',
-                            data)
+                            'INSERT INTO devicezonestatus (sn, time, type, rt, state) VALUES(%s,%s,%s,%s,%s);', data)
                         connection_for_data_and_variables.commit()
 
                         if _numb == 1 and _state == 1:
@@ -625,99 +625,110 @@ def Check_connection():
 
 
 def IO_update():
-    global data_rt1, data_rt2, data_rt3, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, pump_bits, data_end, reset_temp_repeat
+    global data_rt1, data_rt2, data_rt3, variables_list, variables_list_old, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, pump_bits, data_end, reset_temp_repeat
 
-    if variable_all_OFF == 2 or variable_all_OFF == 5 or variable_all_OFF == 8:  # all outputs in auto/manual mode
+
+    if variables_list[4] in range(2, 9, 3):  # all outputs in auto/manual mode
         bias = 16
-        if (variable_RT1 == 2 or variable_RT1 == 5 or variable_RT1 == 8) and (GPIO.input(therm1_stat) == GPIO.HIGH):
+        if variables_list_old[0] != variables_list[0]:
+            if (variables_list[0] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.HIGH):
+                GPIO.output(pump_ctrl1, GPIO.HIGH)
+                pump_bits |= (1 << 0)
+                bias |= (1 << 3)
+            if (variables_list[0] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.LOW):
+                GPIO.output(pump_ctrl1, GPIO.LOW)
+                pump_bits |= (1 << 1)
+                bias &= ~(1 << 3)
+            if (variables_list[0] in range(1, 9, 3)):
+                GPIO.output(pump_ctrl1, GPIO.HIGH)
+                pump_bits |= (1 << 0)
+                bias |= (1 << 3)
+            if (variables_list[0] in range(0, 9, 3)):
+                GPIO.output(pump_ctrl1, GPIO.LOW)
+                pump_bits |= (1 << 1)
+                bias &= ~(1 << 3)
+            variables_list_old[0] = variables_list[0]
+
+        if variables_list_old[1] != variables_list[1]:
+            if (variables_list[1] in range(2, 9, 3)) and (GPIO.input(therm2_stat) == GPIO.HIGH):
+                GPIO.output(pump_ctrl2, GPIO.HIGH)
+                pump_bits |= (1 << 2)
+                bias |= (1 << 2)
+            if (variables_list[1] in range(2, 9, 3)) and (GPIO.input(therm2_stat) == GPIO.LOW):
+                GPIO.output(pump_ctrl2, GPIO.LOW)
+                pump_bits |= (1 << 3)
+                bias &= ~(1 << 2)
+            if (variables_list[1] in range(1, 9, 3)):
+                GPIO.output(pump_ctrl2, GPIO.HIGH)
+                pump_bits |= (1 << 2)
+                bias |= (1 << 2)
+            if (variables_list[1] in range(0, 9, 3)):
+                GPIO.output(pump_ctrl2, GPIO.LOW)
+                pump_bits |= (1 << 3)
+                bias &= ~(1 << 2)
+            variables_list_old[1] = variables_list[1]
+
+        if variables_list_old[2] != variables_list[2]:
+            if (variables_list[2] in range(2, 9, 3)) and (GPIO.input(therm3_stat) == GPIO.HIGH):
+                GPIO.output(pump_ctrl3, GPIO.HIGH)
+                pump_bits |= (1 << 4)
+                bias |= (1 << 1)
+            if (variables_list[2] in range(2, 9, 3)) and (GPIO.input(therm3_stat) == GPIO.LOW):
+                GPIO.output(pump_ctrl3, GPIO.LOW)
+                pump_bits |= (1 << 5)
+                bias &= ~(1 << 1)
+            if (variables_list[2] in range(1, 9, 3)):
+                GPIO.output(pump_ctrl3, GPIO.HIGH)
+                pump_bits |= (1 << 4)
+                bias |= (1 << 1)
+            if (variables_list[2] in range(0, 9, 3)):
+                GPIO.output(pump_ctrl3, GPIO.LOW)
+                pump_bits |= (1 << 5)
+                bias &= ~(1 << 1)
+            variables_list_old[2] = variables_list[2]
+
+        if variables_list_old[3] != variables_list[3]:
+            if (variables_list[3] in range(2, 9, 3)) and (
+                    GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
+                GPIO.output(endswitch_ctrl, GPIO.HIGH)
+                data_end = 1
+                bias |= (1 << 0)
+            if (variables_list[3] in range(2, 9, 3)) and (
+                    GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
+                GPIO.output(endswitch_ctrl, GPIO.LOW)
+                data_end = 0
+                bias &= ~(1 << 0)
+            if (variables_list[3] in range(1, 9, 3)):
+                GPIO.output(endswitch_ctrl, GPIO.HIGH)
+                data_end = 1
+                bias |= (1 << 0)
+            if (variables_list[3] in range(0, 9, 3)):
+                GPIO.output(endswitch_ctrl, GPIO.LOW)
+                data_end = 0
+                bias &= ~(1 << 0)
+            variables_list_old[3] = variables_list[3]
+
+    if variables_list_old[4] != variables_list[4]:
+        if variables_list[4] in range(1, 9, 3):  # all outputs ON
             GPIO.output(pump_ctrl1, GPIO.HIGH)
             pump_bits |= (1 << 0)
-            bias |= (1 << 3)
-        if (variable_RT1 == 2 or variable_RT1 == 5 or variable_RT1 == 8) and (GPIO.input(therm1_stat) == GPIO.LOW):
-            GPIO.output(pump_ctrl1, GPIO.LOW)
-            pump_bits |= (1 << 1)
-            bias &= ~(1 << 3)
-        if (variable_RT1 == 1 or variable_RT1 == 4 or variable_RT1 == 7):
-            GPIO.output(pump_ctrl1, GPIO.HIGH)
-            pump_bits |= (1 << 0)
-            bias |= (1 << 3)
-        if (variable_RT1 == 0 or variable_RT1 == 3 or variable_RT1 == 6):
-            GPIO.output(pump_ctrl1, GPIO.LOW)
-            pump_bits |= (1 << 1)
-            bias &= ~(1 << 3)
-
-        if (variable_RT2 == 2 or variable_RT2 == 5 or variable_RT2 == 8) and (GPIO.input(therm2_stat) == GPIO.HIGH):
             GPIO.output(pump_ctrl2, GPIO.HIGH)
             pump_bits |= (1 << 2)
-            bias |= (1 << 2)
-        if (variable_RT2 == 2 or variable_RT2 == 5 or variable_RT2 == 8) and (GPIO.input(therm2_stat) == GPIO.LOW):
-            GPIO.output(pump_ctrl2, GPIO.LOW)
-            pump_bits |= (1 << 3)
-            bias &= ~(1 << 2)
-        if (variable_RT2 == 1 or variable_RT2 == 4 or variable_RT2 == 7):
-            GPIO.output(pump_ctrl2, GPIO.HIGH)
-            pump_bits |= (1 << 2)
-            bias |= (1 << 2)
-        if (variable_RT2 == 0 or variable_RT2 == 3 or variable_RT2 == 6):
-            GPIO.output(pump_ctrl2, GPIO.LOW)
-            pump_bits |= (1 << 3)
-            bias &= ~(1 << 2)
-
-        if (variable_RT3 == 2 or variable_RT3 == 5 or variable_RT3 == 8) and (GPIO.input(therm3_stat) == GPIO.HIGH):
             GPIO.output(pump_ctrl3, GPIO.HIGH)
             pump_bits |= (1 << 4)
-            bias |= (1 << 1)
-        if (variable_RT3 == 2 or variable_RT3 == 5 or variable_RT3 == 8) and (GPIO.input(therm3_stat) == GPIO.LOW):
+            GPIO.output(endswitch_ctrl, GPIO.HIGH)
+            bias = 31
+
+        if variables_list[4] in range(0, 9, 3):  # all outputs OFF
+            GPIO.output(pump_ctrl1, GPIO.LOW)
+            pump_bits |= (1 << 1)
+            GPIO.output(pump_ctrl2, GPIO.LOW)
+            pump_bits |= (1 << 3)
             GPIO.output(pump_ctrl3, GPIO.LOW)
             pump_bits |= (1 << 5)
-            bias &= ~(1 << 1)
-        if (variable_RT3 == 1 or variable_RT3 == 4 or variable_RT3 == 7):
-            GPIO.output(pump_ctrl3, GPIO.HIGH)
-            pump_bits |= (1 << 4)
-            bias |= (1 << 1)
-        if (variable_RT3 == 0 or variable_RT3 == 3 or variable_RT3 == 6):
-            GPIO.output(pump_ctrl3, GPIO.LOW)
-            pump_bits |= (1 << 5)
-            bias &= ~(1 << 1)
-
-        if (variable_BLR == 2 or variable_BLR == 5 or variable_BLR == 8) and (
-                GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
-            GPIO.output(endswitch_ctrl, GPIO.HIGH)
-            data_end = 1
-            bias |= (1 << 0)
-        if (variable_BLR == 2 or variable_BLR == 5 or variable_BLR == 8) and (
-                GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
             GPIO.output(endswitch_ctrl, GPIO.LOW)
-            data_end = 0
-            bias &= ~(1 << 0)
-        if (variable_BLR == 1 or variable_BLR == 4 or variable_BLR == 7):
-            GPIO.output(endswitch_ctrl, GPIO.HIGH)
-            data_end = 1
-            bias |= (1 << 0)
-        if (variable_BLR == 0 or variable_BLR == 3 or variable_BLR == 6):
-            GPIO.output(endswitch_ctrl, GPIO.LOW)
-            data_end = 0
-            bias &= ~(1 << 0)
-
-    if variable_all_OFF == 1 or variable_all_OFF == 4 or variable_all_OFF == 7:  # all outputs ON
-        GPIO.output(pump_ctrl1, GPIO.HIGH)
-        pump_bits |= (1 << 0)
-        GPIO.output(pump_ctrl2, GPIO.HIGH)
-        pump_bits |= (1 << 2)
-        GPIO.output(pump_ctrl3, GPIO.HIGH)
-        pump_bits |= (1 << 4)
-        GPIO.output(endswitch_ctrl, GPIO.HIGH)
-        bias = 31
-
-    if variable_all_OFF == 0 or variable_all_OFF == 3 or variable_all_OFF == 6:  # all outputs OFF
-        GPIO.output(pump_ctrl1, GPIO.LOW)
-        pump_bits |= (1 << 1)
-        GPIO.output(pump_ctrl2, GPIO.LOW)
-        pump_bits |= (1 << 3)
-        GPIO.output(pump_ctrl3, GPIO.LOW)
-        pump_bits |= (1 << 5)
-        GPIO.output(endswitch_ctrl, GPIO.LOW)
-        bias = 16
+            bias = 16
+        variables_list_old[4] = variables_list[4]
 
     if data_rt1 == 0 and (GPIO.input(therm1_stat) == GPIO.HIGH):
         data_rt1 = 1
