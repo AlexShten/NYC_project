@@ -821,16 +821,19 @@ def Update_source():
 # ----------------------------------------------------------------------------------------------------
 
 def Read_ADCs():
-    global data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3, data_ps, adc, address, bus
+    global data_boilerpumpfunamps, data_boiler, data_ics1, data_ics2, data_ics3, data_ps, adc, address, bus, write_error_thread_status, error_boilercurrent
 
     while True:
         if adc == 1:
 
             try:
-                tmp = bus.read_i2c_block_data(address, 1)  # read channel 1 from arduino
+                tmp = bus.read_i2c_block_data(100, 1)  # read channel 1 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics1 = round(number, 2)
+
             except BaseException:
+                write_error_thread_status = 1
+                error_boilercurrent = 1
                 pass
                 # print("data_pump1 error")
 
