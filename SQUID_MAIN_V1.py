@@ -1312,10 +1312,15 @@ if __name__ == "__main__":
     time.sleep(1)
     call_Request_error_to_server.start()
 
+    x = 0
     while True:
         if main == 1:
 
             IO_update()
+
+            x +=1
+            if x>60:
+                address = 100
 
             if wait_wifi > wait_times[wifi_recconnect_repeat]:
 
