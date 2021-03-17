@@ -632,12 +632,13 @@ def IO_update():
         bias = 16
 
         if variables_list_old[3] != variables_list[3] or variables_list_old[0] != variables_list[0] or variables_list_old[1] != variables_list[1] or variables_list_old[2] != variables_list[2]:
-            if (variables_list[3] in range(2, 9, 3)) and (
-                    GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
+            # if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
+            if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(pump_ctrl1) == 1 or GPIO.input(pump_ctrl2) == 1 or GPIO.input(pump_ctrl3) == 1):
                 GPIO.output(endswitch_ctrl, GPIO.HIGH)
                 data_end = 1
                 bias |= (1 << 0)
-            if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
+            # if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
+            if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(pump_ctrl1) == 0) and (GPIO.input(pump_ctrl2) == 0) and (GPIO.input(pump_ctrl3) == 0):
                 GPIO.output(endswitch_ctrl, GPIO.LOW)
                 data_end = 0
                 bias &= ~(1 << 0)
