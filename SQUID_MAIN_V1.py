@@ -1273,6 +1273,7 @@ call_Check_connection = threading.Thread(target=Check_connection, args=(), daemo
 call_Init_WiFi = threading.Thread(target=Init_WiFi, args=(), daemon=True)
 
 call_Request_data_to_server = threading.Thread(target=Request_data_to_server, args=(), daemon=True)
+call_Request_error_to_server = threading.Thread(target=Request_error_to_server, args=(), daemon=True)
 call_Request_localDB = threading.Thread(target=Request_localDB, args=(), daemon=True)
 
 call_Read_ADCs = threading.Thread(target=Read_ADCs, args=(), daemon=True)
@@ -1301,6 +1302,8 @@ if __name__ == "__main__":
     check_thread_status = 1
     time.sleep(1)
     call_Request_data_to_server.start()
+    time.sleep(1)
+    call_Request_error_to_server.start()
 
     while True:
         if main == 1:
@@ -1346,6 +1349,8 @@ if __name__ == "__main__":
             if call_System_tick_05_sec.is_alive() == False:
                 restart = 1
             if call_Request_data_to_server.is_alive() == False:
+                restart = 1
+            if call_Request_error_to_server.is_alive() == False:
                 restart = 1
             # if call_Request_localDB.is_alive() == False:
             #     restart = 1
