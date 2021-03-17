@@ -1318,8 +1318,8 @@ if __name__ == "__main__":
 
             IO_update()
 
-            x +=1
-            if x>60:
+            x = x + 1
+            if x > 60:
                 address = 100
 
             if wait_wifi > wait_times[wifi_recconnect_repeat]:
