@@ -104,7 +104,7 @@ data_wt = 0
 # ---------------------------
 error_sn = SN
 error_time = 0
-error_boilercurrent = 0
+error_boilercurrent = 2
 error_ics1 = 0
 error_ics2 = 0
 error_ics3 = 0
@@ -827,13 +827,17 @@ def Read_ADCs():
         if adc == 1:
 
             try:
-                tmp = bus.read_i2c_block_data(100, 1)  # read channel 1 from arduino
+                tmp = bus.read_i2c_block_data(address, 1)  # read channel 1 from arduino
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics1 = round(number, 2)
+                if error_boilercurrent >= 1:
+                    write_error_thread_status = 1
+                    error_boilercurrent = 0
 
             except BaseException:
-                write_error_thread_status = 1
-                error_boilercurrent = 1
+                if error_boilercurrent == 0:
+                    write_error_thread_status = 1
+                    error_boilercurrent = 1
                 pass
                 # print("data_pump1 error")
 
