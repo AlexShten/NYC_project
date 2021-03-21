@@ -894,6 +894,11 @@ def Read_ADCs():
                 pass
                 # print("data_PS error")
 
+            try:
+                tmp = bus.read_i2c_block_data(address, 9)  # reset watchdog
+            except BaseException:
+                pass
+
             adc = 0
 
 
