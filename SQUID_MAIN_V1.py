@@ -896,6 +896,8 @@ def Read_ADCs():
 
             try:
                 if data_ics1 < 0.01 and data_ics2 < 0.01 and data_ics3 < 0.01 and data_boiler < 0.01 and data_boilerpumpfunamps < 0.01 and data_ps < 0.01:
+                    error_boilercurrent = 9
+                    write_error_thread_status = 1
                     time.sleep(6)
                 else:
                     tmp = bus.read_i2c_block_data(address, 9)  # reset watchdog
