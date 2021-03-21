@@ -844,8 +844,8 @@ def Read_ADCs():
                 number = (tmp[0] + tmp[1] * 256) / 1000
                 data_ics1 = round(number, 2)
                 if error_boilercurrent >= 1:
-                    write_error_thread_status = 1
                     error_boilercurrent = 0
+                    write_error_thread_status = 0
 
             except BaseException:
                 if error_boilercurrent == 0:
