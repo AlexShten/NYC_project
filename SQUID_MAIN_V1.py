@@ -845,10 +845,10 @@ def Read_ADCs():
                 data_ics1 = round(number, 2)
                 if error_boilercurrent >= 1:
                     error_boilercurrent = 0
-                    write_error_thread_status = 0
+                    write_error_thread_status = 1
 
             except BaseException:
-                if error_boilercurrent == 0:
+                if error_boilercurrent == 0 or error_boilercurrent == 2:
                     write_error_thread_status = 1
                     error_boilercurrent = 1
                 pass
