@@ -915,6 +915,7 @@ def Search_sens():
     global sensors_in_system, quantity_temp_sens, path_to_file
 
     try:
+        i = 0
         for sensor in W1ThermSensor.get_available_sensors():  # [W1ThermSensor.THERM_SENSOR_DS18B20]):
             available_sensors[i] = sensor.id
             # os.system("sudo su")
