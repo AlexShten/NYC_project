@@ -9,7 +9,6 @@ import RPi.GPIO as GPIO
 import smbus
 from w1thermsensor import W1ThermSensor
 
-from pyowm import OWM
 import sqlite3
 import psycopg2
 from psycopg2 import extensions, connect, InterfaceError, DatabaseError, OperationalError
@@ -22,12 +21,12 @@ server_dbname = 'production'
 server_username = 'maksym'
 server_password = 'Cj75mrwBM2yXgVnnW4ug'
 
-SN ="Test_SN_UA"#sys.argv[1]  # # read from file
+SN = sys.argv[1]  # # read from file
 TZ = "UTC"
 path_to_file = "/home/pi/sensorsID.txt"
-cmd = " "#"reboot"
+cmd = "reboot"
 
-quantity_temp_sens = 7  # read from file
+quantity_temp_sens = 8  # read from file
 # ----------------------------------------------------------
 # FLAGs
 read_vars_thread_status = 0
@@ -52,7 +51,6 @@ variables_list = [2, 2, 2, 2, 2, "0", "0"]
 variables_list_old = [2, 2, 2, 2, 2]
 therm_list = [0, 0, 0]
 therm_list_old = [0, 0, 0]
-weather_timer = 2000
 watchdog = 0
 
 reset_temp_repeat = 0
@@ -130,8 +128,8 @@ main_db_data_list = []
 inner_db_data_list = [None] * 20
 inner_db_data_list_copy = []
 # ---------------------------
-available_sensors = [None] * 7
-sensors_in_system = [None] * 7
+available_sensors = [None] * 8
+sensors_in_system = [None] * 8
 
 
 def Print_error(Source, Error):
@@ -142,7 +140,7 @@ def Print_error(Source, Error):
 
 
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, weather_timer, watchdog, update, set_WiFi, wifi_recconnect_flag, wait_wifi
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, watchdog, update, set_WiFi, wifi_recconnect_flag, wait_wifi
 
     MAIN_TIME_LAST = 0
     while True:
@@ -154,7 +152,6 @@ def System_tick_1_sec():
             db_thread_status = 1
             main = 1
             adc = 1
-            weather_timer += 1
 
             if wifi_recconnect_flag == 1:
                 wait_wifi += 1
@@ -820,14 +817,14 @@ def Update_source():
     data_list = [SN, variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid,
                  variable_wifipass]
     variables_list = data_list
-
+0
     cursor.execute(
         'INSERT INTO devicevariables (sn, rt1, rt2, rt3, blr, allof, wifiid, wifipass) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);',
         data_list)
     connection_for_data_and_variables.commit()
 
     os.system(
-        'curl -L https://raw.githubusercontent.com/AlexShten/NYC_project/main/SQUID_MAIN_V1.py -o /home/pi/GitHub_source/SQUID_MAIN_V1.py')
+        'curl -L https://raw.githubusercontent.com/AlexShten/NYC_project/main/IONIQ_MAIN_V1.py -o /home/pi/GitHub_source/IONIQ_MAIN_V1.py')
     os.system(cmd)
 
 
@@ -971,8 +968,8 @@ def Search_sens():
 
 
 def Read_temps():
-    global write_error_thread_status, sensors_in_system, weather_timer
-    global data_t1, error_t1, data_t2, error_t2, data_t3, error_t3, data_t4, error_t4, data_t5, error_t5, data_t6, error_t6, data_t7, error_t7, data_wt
+    global write_error_thread_status, sensors_in_system
+    global data_t1, error_t1, data_t2, error_t2, data_t3, error_t3, data_t4, error_t4, data_t5, error_t5, data_t6, error_t6, data_t7, error_t7
     sensor1_error = 1
     sensor2_error = 1
     sensor3_error = 1
@@ -1164,18 +1161,6 @@ def Read_temps():
                 pass
                 # print("Sensor %s not available" % sensors_in_system[6])
 
-        if weather_timer >= 1800:
-            try:
-                owm = OWM('4c4f23e81d10a949967cf9a7223182e1')
-                mgr = owm.weather_manager()
-                observation = mgr.weather_at_place("New Paltz,US")
-                w = observation.weather
-                data_wt = w.temperature('fahrenheit')['temp']
-            except BaseException as e:
-                pass
-                # print(e)
-            weather_timer = 0
-
 
 # def DB_clear():
 #     i=0
@@ -1295,7 +1280,7 @@ GPIO.setup(therm3_stat, GPIO.IN)
 GPIO.setup(bypass_stat, GPIO.IN)
 GPIO.setup(reset_temp, GPIO.IN)
 
-Search_sens()
+#Search_sens()
 
 bus = smbus.SMBus(1)
 address = 3
@@ -1375,9 +1360,16 @@ if __name__ == "__main__":
                 Update_source()
 
             # ---------------------------???????????????How to replace sensor???????
+
+            quantity_plugged=0
+            for sens in W1ThermSensor.get_available_sensors():
+                quantity_plugged+=1
+            quantity_in_file=0
             for i in range(quantity_temp_sens):
-                if sensors_in_system[i] == None:
-                    Search_sens()
+                if sensors_in_system[i] != None:
+                    quantity_in_file+=1
+            if quantity_plugged>quantity_in_file:
+                Search_sens()
 
             if call_System_tick_1_sec.is_alive() == False:
                 restart = 1
