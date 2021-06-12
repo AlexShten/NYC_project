@@ -914,57 +914,48 @@ def Read_ADCs():
 def Search_sens():
     global sensors_in_system, quantity_temp_sens, path_to_file
 
-    i = 0
-    if os.path.exists(path_to_file):
-        with open(path_to_file, "r") as file:
-            for line in file:
-                sensors_in_system[i] = line.replace('\n', '')
-                i = i + 1
-    else:
-        try:
-            for sensor in W1ThermSensor.get_available_sensors():  # [W1ThermSensor.THERM_SENSOR_DS18B20]):
-                available_sensors[i] = sensor.id
-                # os.system("sudo su")
-                # sensor.set_resolution(10, persist=True)
-                i = i + 1
-        except BaseException as e:
-            pass
-            # print(e)
+    try:
+        for sensor in W1ThermSensor.get_available_sensors():  # [W1ThermSensor.THERM_SENSOR_DS18B20]):
+            available_sensors[i] = sensor.id
+            # os.system("sudo su")
+            # sensor.set_resolution(10, persist=True)
+            i = i + 1
+    except BaseException as e:
+        pass
+        # print(e)
 
-        equality = 0
-        for step1 in range(quantity_temp_sens):
-            if available_sensors[step1] != None:
-                equality = 0
-                for step2 in range(quantity_temp_sens):
-                    if sensors_in_system[step2] == available_sensors[step1]:
-                        equality = 1
+
+    for step1 in range(quantity_temp_sens):
+        if available_sensors[step1] != None:
+            equality = 0
+            for step2 in range(quantity_temp_sens):
+                if sensors_in_system[step2] == available_sensors[step1]:
+                    equality = 1
+                    break
+            if equality == 0:
+                for step3 in range(quantity_temp_sens):
+                    if sensors_in_system[step3] == None:
+                        sensors_in_system[step3] = copy.deepcopy(available_sensors[step1])
                         break
-                if equality == 0:
-                    for step2 in range(quantity_temp_sens):
-                        if sensors_in_system[step2] == None:
-                            sensors_in_system[step2] = copy.deepcopy(available_sensors[step1])
-                            break
-            else:
-                continue
+        else:
+            continue
 
-        i = 0
-        for step3 in range(quantity_temp_sens):
-            if sensors_in_system[step3] == None:
-                i = i + 1
-        if i == 0:
-            try:
-                write_in_file = open(path_to_file, "w")
-                try:
-                    for step4 in range(quantity_temp_sens):
-                        write_in_file.write(sensors_in_system[step4] + "\n")
-                except Exception as e:
-                    pass
-                    # Print_error("Write to file", e)
-                finally:
-                    write_in_file.close()
-            except Exception as ex:
-                pass
-                # Print_error("Open file", ex)
+    if os.path.exists("/home/pi/sensorsID.txt"):
+        os.system('rm /home/pi/sensorsID.txt')
+
+    try:
+        write_in_file = open(path_to_file, "w")
+        try:
+            for step4 in range(quantity_temp_sens):
+                write_in_file.write(sensors_in_system[step4] + "\n")
+        except Exception as e:
+            pass
+            # Print_error("Write to file", e)
+        finally:
+            write_in_file.close()
+    except Exception as ex:
+        pass
+        # Print_error("Open file", ex)
 
 
 def Read_temps():
@@ -1323,6 +1314,13 @@ if __name__ == "__main__":
     call_Request_data_to_server.start()
     time.sleep(1)
     call_Request_error_to_server.start()
+
+    i = 0
+    if os.path.exists(path_to_file):
+        with open(path_to_file, "r") as file:
+            for line in file:
+                sensors_in_system[i] = line.replace('\n', '')
+                i = i + 1
 
     while True:
         if main == 1:
