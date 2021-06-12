@@ -764,7 +764,7 @@ def IO_update():
         data_rt3 = 0
         therm_bits |= (1 << 5)
 
-    if GPIO.input(reset_temp) == GPIO.HIGH:
+    if GPIO.input(reset_temp) == GPIO.LOW:
         reset_temp_repeat += 1
     else:
         reset_temp_repeat = 0
