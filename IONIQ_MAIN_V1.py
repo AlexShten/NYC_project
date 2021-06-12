@@ -817,7 +817,7 @@ def Update_source():
     data_list = [SN, variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid,
                  variable_wifipass]
     variables_list = data_list
-0
+
     cursor.execute(
         'INSERT INTO devicevariables (sn, rt1, rt2, rt3, blr, allof, wifiid, wifipass) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);',
         data_list)
