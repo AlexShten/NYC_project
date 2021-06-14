@@ -68,7 +68,6 @@ pump_bits = 0
 
 correct_variables = range(9)
 
-
 numbers = 7200
 Quant = 0
 # ---------------------------2-auto, 1-ON, 0-OFF
@@ -162,15 +161,16 @@ def System_tick_1_sec():
 
             MAIN_TIME_LAST = MAIN_TIME_NEXT
 
+
 def Get_time_delta():
     global data_wt
     try:
         web_time = urlopen('http://just-the-time.appspot.com/')
-        delta_in_seconds = (datetime.utcnow()-datetime.strptime(web_time.read().strip().decode('utf-8'), '%Y-%m-%d %H:%M:%S')).total_seconds()
+        delta_in_seconds = (datetime.utcnow() - datetime.strptime(web_time.read().strip().decode('utf-8'),
+                                                                  '%Y-%m-%d %H:%M:%S')).total_seconds()
         data_wt = delta_in_seconds
     except BaseException:
         pass
-
 
 
 # def System_tick_05_sec():
@@ -627,20 +627,22 @@ def Check_connection():
         if watchdog > 10:
             os.system(cmd)
 
+
 def IO_update():
     global data_rt1, data_rt2, data_rt3, therm_list, therm_list_old, variables_list, variables_list_old, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, pump_bits, data_end, reset_temp_repeat
 
-
     if variables_list[4] in range(2, 9, 3):  # all outputs in auto/manual mode
 
-    #if variables_list_old[3] != variables_list[3] or variables_list_old[0] != variables_list[0] or variables_list_old[1] != variables_list[1] or variables_list_old[2] != variables_list[2]:
+        # if variables_list_old[3] != variables_list[3] or variables_list_old[0] != variables_list[0] or variables_list_old[1] != variables_list[1] or variables_list_old[2] != variables_list[2]:
         # if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.HIGH or GPIO.input(therm2_stat) == GPIO.HIGH or GPIO.input(therm3_stat) == GPIO.HIGH):
-        if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(pump_ctrl1) == 1 or GPIO.input(pump_ctrl2) == 1 or GPIO.input(pump_ctrl3) == 1):
+        if (variables_list[3] in range(2, 9, 3)) and (
+                GPIO.input(pump_ctrl1) == 1 or GPIO.input(pump_ctrl2) == 1 or GPIO.input(pump_ctrl3) == 1):
             GPIO.output(endswitch_ctrl, GPIO.HIGH)
             data_end = 1
             bias |= (1 << 0)
         # if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(therm1_stat) == GPIO.LOW) and (GPIO.input(therm2_stat) == GPIO.LOW) and (GPIO.input(therm3_stat) == GPIO.LOW):
-        if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(pump_ctrl1) == 0) and (GPIO.input(pump_ctrl2) == 0) and (GPIO.input(pump_ctrl3) == 0):
+        if (variables_list[3] in range(2, 9, 3)) and (GPIO.input(pump_ctrl1) == 0) and (
+                GPIO.input(pump_ctrl2) == 0) and (GPIO.input(pump_ctrl3) == 0):
             GPIO.output(endswitch_ctrl, GPIO.LOW)
             data_end = 0
             bias &= ~(1 << 0)
@@ -652,7 +654,7 @@ def IO_update():
             GPIO.output(endswitch_ctrl, GPIO.LOW)
             data_end = 0
             bias &= ~(1 << 0)
-       #variables_list_old[3] = variables_list[3]
+        # variables_list_old[3] = variables_list[3]
 
         if GPIO.input(therm1_stat) == GPIO.HIGH:
             therm_list[0] = 1
@@ -726,8 +728,6 @@ def IO_update():
             variables_list_old[2] = variables_list[2]
             therm_list_old[2] = therm_list[2]
 
-
-
     if variables_list_old[4] != variables_list[4]:
         if variables_list[4] in range(1, 9, 3):  # all outputs ON
             GPIO.output(pump_ctrl1, GPIO.HIGH)
@@ -780,17 +780,16 @@ def IO_update():
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
 
-
             os.system(cmd)
 
     if last_bias != bias:
         try:
             tmp = bus.read_i2c_block_data(address, bias, 1)
             last_bias = bias
-            print(bias)
+            # print(bias)
         except BaseException:
             pass
-            print("bias error")
+            # print("bias error")
 
 
 def Reset_WiFi():
@@ -850,7 +849,7 @@ def Read_ADCs():
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
                 if number < 0:
                     number = 0
-                #print(number)
+                # print(number)
                 data_ics1 = round(number, 2)
                 if error_boilercurrent >= 1:
                     write_error_thread_status = 1
@@ -868,7 +867,7 @@ def Read_ADCs():
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
                 if number < 0:
                     number = 0
-                #print(number)
+                # print(number)
                 data_ics2 = round(number, 2)
             except BaseException:
                 pass
@@ -879,7 +878,7 @@ def Read_ADCs():
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
                 if number < 0:
                     number = 0
-                #print(number)
+                # print(number)
                 data_ics3 = round(number, 2)
             except BaseException:
                 pass
@@ -890,7 +889,7 @@ def Read_ADCs():
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
                 if number < 0:
                     number = 0
-                #print(number)
+                # print(number)
                 data_boiler = round(number, 2)
             except BaseException:
                 pass
@@ -901,7 +900,7 @@ def Read_ADCs():
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
                 if number < 0:
                     number = 0
-                #print(number)
+                # print(number)
                 data_boilerpumpfunamps = round(number, 2)
             except BaseException:
                 pass
@@ -909,8 +908,8 @@ def Read_ADCs():
 
             try:
                 tmp = bus.read_i2c_block_data(address, 6, 2)  # read channel 6 from arduino
-                number = (tmp[0] + tmp[1] * 256)# * 0.17
-                #print(number)
+                number = (tmp[0] + tmp[1] * 256)  # * 0.17
+                # print(number)
                 data_ps = round(number, 2)
             except BaseException:
                 pass
@@ -943,7 +942,6 @@ def Search_sens():
     except BaseException as e:
         pass
         # print(e)
-
 
     for step1 in range(quantity_temp_sens):
         if available_sensors[step1] != None:
@@ -986,6 +984,7 @@ def Read_temp_id_from_file():
             for line in file_id:
                 sensors_in_system[i] = line.replace('\n', '')
                 i = i + 1
+
 
 def Read_temps():
     global write_error_thread_status, sensors_in_system
@@ -1217,15 +1216,11 @@ def Read_temps():
 #         Print_error("Control quant in DB", e)
 
 def LED_blink(status):
-
     if status == 0:
         GPIO.output(pin_LED_WiFi, GPIO.LOW)
 
     if status == 1:
         GPIO.output(pin_LED_WiFi, GPIO.HIGH)
-
-
-
 
 
 def Init_WiFi():
@@ -1253,8 +1248,6 @@ def Init_WiFi():
     wifi_recconnect_flag = 0
 
 
-
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -1267,7 +1260,6 @@ GPIO.setup(pin_current_MCU_ON, GPIO.OUT)
 GPIO.setup(pin_LED_WiFi, GPIO.OUT)
 GPIO.output(pin_current_MCU_ON, GPIO.HIGH)
 GPIO.output(pin_LED_WiFi, GPIO.HIGH)
-
 
 pump_ctrl1 = 13
 pump_ctrl2 = 5
@@ -1296,13 +1288,13 @@ GPIO.setup(therm3_stat, GPIO.IN)
 GPIO.setup(bypass_stat, GPIO.IN)
 GPIO.setup(reset_temp, GPIO.IN)
 
-#Search_sens()
-
+# Search_sens()
+time.sleep(2)
 bus = smbus.SMBus(1)
 address = 3
 
 call_System_tick_1_sec = threading.Thread(target=System_tick_1_sec, args=(), daemon=True)
-#call_System_tick_05_sec = threading.Thread(target=System_tick_05_sec, args=(), daemon=True)
+# call_System_tick_05_sec = threading.Thread(target=System_tick_05_sec, args=(), daemon=True)
 
 call_Check_connection = threading.Thread(target=Check_connection, args=(), daemon=True)
 call_Init_WiFi = threading.Thread(target=Init_WiFi, args=(), daemon=True)
@@ -1316,7 +1308,7 @@ call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 
 if __name__ == "__main__":
 
-    time.sleep(15)
+    time.sleep(5)
 
     TZ = time.tzname[0]
     if TZ != "UTC":
@@ -1328,8 +1320,7 @@ if __name__ == "__main__":
     call_Init_WiFi.start()
 
     call_System_tick_1_sec.start()
-    #call_System_tick_05_sec.start()
-
+    # call_System_tick_05_sec.start()
 
     call_Read_ADCs.start()
     call_Read_temps.start()
@@ -1355,7 +1346,6 @@ if __name__ == "__main__":
             IO_update()
 
             Get_time_delta()
-
 
             if wait_wifi > wait_times[wifi_recconnect_repeat]:
 
@@ -1387,20 +1377,19 @@ if __name__ == "__main__":
                 Update_source()
 
             # ---------------------------???????????????How to replace sensor???????
-            quantity_plugged=0
+            quantity_plugged = 0
             for sens in W1ThermSensor.get_available_sensors():
-                quantity_plugged+=1
-            quantity_in_file=0
+                quantity_plugged += 1
+            quantity_in_file = 0
             for i in range(quantity_temp_sens):
                 if sensors_in_system[i] != None:
-                    quantity_in_file+=1
-            if quantity_plugged>quantity_in_file:
+                    quantity_in_file += 1
+            if quantity_plugged > quantity_in_file:
                 Search_sens()
-
 
             if call_System_tick_1_sec.is_alive() == False:
                 restart = 1
-            #if call_System_tick_05_sec.is_alive() == False:
+            # if call_System_tick_05_sec.is_alive() == False:
             #    restart = 1
             if call_Request_data_to_server.is_alive() == False:
                 restart = 1
@@ -1415,7 +1404,7 @@ if __name__ == "__main__":
             if call_Read_temps.is_alive() == False:
                 restart = 1
             if restart == 1:
-                #pass
+                # pass
                 os.system(cmd)
 
             main = 0
