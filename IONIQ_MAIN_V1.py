@@ -779,6 +779,8 @@ def IO_update():
     if reset_temp_repeat > 5:
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
+
+
             os.system(cmd)
 
     if last_bias != bias:
@@ -1258,16 +1260,14 @@ GPIO.setwarnings(False)
 
 GPIO.cleanup()
 
-pin_LED_User = 18
+pin_current_MCU_ON = 18
 pin_LED_WiFi = 17
-pin_LED_Power = 27
 
-GPIO.setup(pin_LED_User, GPIO.OUT)
+GPIO.setup(pin_current_MCU_ON, GPIO.OUT)
 GPIO.setup(pin_LED_WiFi, GPIO.OUT)
-# GPIO.setup(pin_LED_Power, GPIO.OUT)
-GPIO.output(pin_LED_User, GPIO.HIGH)
-GPIO.output(pin_LED_WiFi, GPIO.LOW)
-# GPIO.output(pin_LED_Power, GPIO.HIGH)
+GPIO.output(pin_current_MCU_ON, GPIO.LOW)
+GPIO.output(pin_LED_WiFi, GPIO.HIGH)
+
 
 pump_ctrl1 = 13
 pump_ctrl2 = 5
@@ -1330,6 +1330,7 @@ if __name__ == "__main__":
     call_System_tick_1_sec.start()
     #call_System_tick_05_sec.start()
 
+    GPIO.output(pin_current_MCU_ON, GPIO.HIGH)
     call_Read_ADCs.start()
     call_Read_temps.start()
 
