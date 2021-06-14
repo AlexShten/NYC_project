@@ -167,7 +167,7 @@ def Get_time_delta():
     try:
         web_time = urlopen('http://just-the-time.appspot.com/')
         delta_in_seconds = (datetime.utcnow()-datetime.strptime(web_time.read().strip().decode('utf-8'), '%Y-%m-%d %H:%M:%S')).total_seconds()
-        data_wt = 111#delta_in_seconds
+        data_wt = delta_in_seconds
     except BaseException:
         pass
 
