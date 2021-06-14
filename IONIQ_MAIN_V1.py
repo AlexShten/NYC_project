@@ -839,6 +839,8 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 1, 2)  # read channel 1 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
+                if number < 0:
+                    number = 0
                 #print(number)
                 data_ics1 = round(number, 2)
                 if error_boilercurrent >= 1:
@@ -855,6 +857,8 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 2, 2)  # read channel 2 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
+                if number < 0:
+                    number = 0
                 #print(number)
                 data_ics2 = round(number, 2)
             except BaseException:
@@ -864,6 +868,8 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 3, 2)  # read channel 3 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
+                if number < 0:
+                    number = 0
                 #print(number)
                 data_ics3 = round(number, 2)
             except BaseException:
@@ -873,6 +879,8 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 4, 2)  # read channel 4 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
+                if number < 0:
+                    number = 0
                 #print(number)
                 data_boiler = round(number, 2)
             except BaseException:
@@ -882,6 +890,8 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 5, 2)  # read channel 5 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
+                if number < 0:
+                    number = 0
                 #print(number)
                 data_boilerpumpfunamps = round(number, 2)
             except BaseException:
