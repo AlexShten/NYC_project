@@ -44,7 +44,6 @@ led = 0
 adc = 0
 retries = 0
 WIFI_LED_ON = 1
-var = 0
 restart = 0
 connection_for_data_and_variables = None
 variables_list = [2, 2, 2, 2, 2, "0", "0"]
@@ -162,19 +161,13 @@ def System_tick_1_sec():
             MAIN_TIME_LAST = MAIN_TIME_NEXT
 
 
-def System_tick_05_sec():
-    global led
-
-    TIME_LAST = 0
-    while True:
-
-        TIME_NEXT = time.perf_counter()
-        if TIME_NEXT - TIME_LAST >= 0.5:
-            led = 1
-
-            TIME_LAST = TIME_NEXT
-
-
+# def System_tick_05_sec():
+#     TIME_LAST = 0
+#     while True:
+#         TIME_NEXT = time.perf_counter()
+#         if TIME_NEXT - TIME_LAST >= 0.5:
+#             #do something
+#             TIME_LAST = TIME_NEXT
 # ----------------------------------------------------------------------------------------------------
 
 # def DB_switch_LOCAL_EXTERNAL():
@@ -1208,19 +1201,15 @@ def Read_temps():
 #         Print_error("Control quant in DB", e)
 
 def LED_blink(status):
-    global var
+
     if status == 0:
         GPIO.output(pin_LED_WiFi, GPIO.LOW)
 
     if status == 1:
-        if var == 0:
-            GPIO.output(pin_LED_WiFi, GPIO.HIGH)
-            var = 1
+        GPIO.output(pin_LED_WiFi, GPIO.HIGH)
 
-        else:
-            GPIO.output(pin_LED_WiFi, GPIO.LOW)
-            #             os.system("clear")
-            var = 0
+
+
 
 
 def Init_WiFi():
@@ -1297,7 +1286,7 @@ bus = smbus.SMBus(1)
 address = 3
 
 call_System_tick_1_sec = threading.Thread(target=System_tick_1_sec, args=(), daemon=True)
-call_System_tick_05_sec = threading.Thread(target=System_tick_05_sec, args=(), daemon=True)
+#call_System_tick_05_sec = threading.Thread(target=System_tick_05_sec, args=(), daemon=True)
 
 call_Check_connection = threading.Thread(target=Check_connection, args=(), daemon=True)
 call_Init_WiFi = threading.Thread(target=Init_WiFi, args=(), daemon=True)
@@ -1317,7 +1306,7 @@ if __name__ == "__main__":
     call_Init_WiFi.start()
 
     call_System_tick_1_sec.start()
-    call_System_tick_05_sec.start()
+    #call_System_tick_05_sec.start()
 
     call_Read_ADCs.start()
     call_Read_temps.start()
@@ -1386,8 +1375,8 @@ if __name__ == "__main__":
 
             if call_System_tick_1_sec.is_alive() == False:
                 restart = 1
-            if call_System_tick_05_sec.is_alive() == False:
-                restart = 1
+            #if call_System_tick_05_sec.is_alive() == False:
+            #    restart = 1
             if call_Request_data_to_server.is_alive() == False:
                 restart = 1
             if call_Request_error_to_server.is_alive() == False:
