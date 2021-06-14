@@ -4,6 +4,7 @@ import threading
 import time
 import copy
 from datetime import datetime
+from urllib.request import urlopen
 
 import RPi.GPIO as GPIO
 import smbus
@@ -160,6 +161,16 @@ def System_tick_1_sec():
                 watchdog += 1
 
             MAIN_TIME_LAST = MAIN_TIME_NEXT
+
+def Get_time_delta():
+    global data_wt
+    try:
+        web_time = urlopen('http://just-the-time.appspot.com/')
+        delta_in_seconds = (datetime.utcnow()-datetime.strptime(web_time.read().strip().decode('utf-8'), '%Y-%m-%d %H:%M:%S')).total_seconds()
+        data_wt = 111#delta_in_seconds
+    except BaseException:
+        pass
+
 
 
 # def System_tick_05_sec():
@@ -1341,6 +1352,8 @@ if __name__ == "__main__":
         if main == 1:
 
             IO_update()
+
+            Get_time_delta()
 
 
             if wait_wifi > wait_times[wifi_recconnect_repeat]:
