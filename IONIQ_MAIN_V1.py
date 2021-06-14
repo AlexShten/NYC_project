@@ -1265,7 +1265,7 @@ pin_LED_WiFi = 17
 
 GPIO.setup(pin_current_MCU_ON, GPIO.OUT)
 GPIO.setup(pin_LED_WiFi, GPIO.OUT)
-GPIO.output(pin_current_MCU_ON, GPIO.LOW)
+GPIO.output(pin_current_MCU_ON, GPIO.HIGH)
 GPIO.output(pin_LED_WiFi, GPIO.HIGH)
 
 
@@ -1330,7 +1330,7 @@ if __name__ == "__main__":
     call_System_tick_1_sec.start()
     #call_System_tick_05_sec.start()
 
-    GPIO.output(pin_current_MCU_ON, GPIO.HIGH)
+
     call_Read_ADCs.start()
     call_Read_temps.start()
 
