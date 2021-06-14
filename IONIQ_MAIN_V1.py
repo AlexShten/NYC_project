@@ -139,7 +139,7 @@ def Print_error(Source, Error):
 
 
 def System_tick_1_sec():
-    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, watchdog, update, set_WiFi, wifi_recconnect_flag, wait_wifi
+    global write_data_thread_status, read_vars_thread_status, db_thread_status, main, adc, watchdog, update, set_WiFi, wifi_recconnect_flag, wait_wifi, led
 
     MAIN_TIME_LAST = 0
     while True:
@@ -151,6 +151,7 @@ def System_tick_1_sec():
             db_thread_status = 1
             main = 1
             adc = 1
+            led = 1
 
             if wifi_recconnect_flag == 1:
                 wait_wifi += 1
