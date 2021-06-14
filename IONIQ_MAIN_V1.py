@@ -219,6 +219,8 @@ def Request_data_to_server():
     global data_t1, data_t2, data_t3, data_t4, data_t5, data_t6, data_t7, data_ps, data_rt1, data_rt2, data_rt3
     global data_wt, data_end
 
+    WIFI_LED_ON = 1
+
     while retries < 10:
         pass
 
