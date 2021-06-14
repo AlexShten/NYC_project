@@ -81,7 +81,7 @@ variable_wifipass = 0
 # ---------------------------
 data_sn = SN
 data_time = 0
-data_zone = TZ
+data_zone = 0
 data_boilerpumpfunamps = 0
 data_ics1 = 0
 data_ics2 = 0
@@ -1311,6 +1311,7 @@ if __name__ == "__main__":
     if TZ != "UTC":
         os.system('sudo timedatectl set-timezone Etc/UTC')
         os.system('reboot')
+    data_zone = TZ
 
     # Init_WiFi()
     call_Init_WiFi.start()
