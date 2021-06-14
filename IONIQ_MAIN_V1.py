@@ -22,7 +22,7 @@ server_username = 'maksym'
 server_password = 'Cj75mrwBM2yXgVnnW4ug'
 
 SN = sys.argv[1]  # # read from file
-TZ = "UTC"
+TZ = ""
 path_to_file = "/home/pi/sensorsID.txt"
 cmd = "reboot"
 
@@ -1240,6 +1240,8 @@ def Init_WiFi():
     wifi_recconnect_flag = 0
 
 
+
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -1304,6 +1306,11 @@ call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 if __name__ == "__main__":
 
     time.sleep(15)
+
+    TZ = time.tzname[0]
+    if TZ != "UTC":
+        os.system('sudo timedatectl set-timezone Etc/UTC')
+        os.system('reboot')
 
     # Init_WiFi()
     call_Init_WiFi.start()
