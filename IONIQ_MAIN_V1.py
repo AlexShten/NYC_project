@@ -839,7 +839,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 1, 2)  # read channel 1 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
-                print(number)
+                #print(number)
                 data_ics1 = round(number, 2)
                 if error_boilercurrent >= 1:
                     write_error_thread_status = 1
@@ -855,7 +855,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 2, 2)  # read channel 2 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
-                print(number)
+                #print(number)
                 data_ics2 = round(number, 2)
             except BaseException:
                 pass
@@ -864,7 +864,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 3, 2)  # read channel 3 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
-                print(number)
+                #print(number)
                 data_ics3 = round(number, 2)
             except BaseException:
                 pass
@@ -873,7 +873,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 4, 2)  # read channel 4 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
-                print(number)
+                #print(number)
                 data_boiler = round(number, 2)
             except BaseException:
                 pass
@@ -882,7 +882,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 5, 2)  # read channel 5 from arduino
                 number = (((tmp[0] + tmp[1] * 256)) - 100) / 1000
-                print(number)
+                #print(number)
                 data_boilerpumpfunamps = round(number, 2)
             except BaseException:
                 pass
@@ -891,7 +891,7 @@ def Read_ADCs():
             try:
                 tmp = bus.read_i2c_block_data(address, 6, 2)  # read channel 6 from arduino
                 number = (tmp[0] + tmp[1] * 256)# * 0.17
-                print(number)
+                #print(number)
                 data_ps = round(number, 2)
             except BaseException:
                 pass
@@ -958,6 +958,15 @@ def Search_sens():
         pass
         # Print_error("Open file", ex)
 
+
+def Read_temp_id_from_file():
+    global sensors_in_system, path_to_file
+    i = 0
+    if os.path.exists(path_to_file):
+        with open(path_to_file, "r") as file_id:
+            for line in file_id:
+                sensors_in_system[i] = line.replace('\n', '')
+                i = i + 1
 
 def Read_temps():
     global write_error_thread_status, sensors_in_system
@@ -1316,12 +1325,7 @@ if __name__ == "__main__":
     time.sleep(1)
     call_Request_error_to_server.start()
 
-    i = 0
-    if os.path.exists(path_to_file):
-        with open(path_to_file, "r") as file:
-            for line in file:
-                sensors_in_system[i] = line.replace('\n', '')
-                i = i + 1
+    Read_temp_id_from_file()
 
     while True:
         if main == 1:
@@ -1359,7 +1363,6 @@ if __name__ == "__main__":
                 Update_source()
 
             # ---------------------------???????????????How to replace sensor???????
-
             quantity_plugged=0
             for sens in W1ThermSensor.get_available_sensors():
                 quantity_plugged+=1
@@ -1369,6 +1372,7 @@ if __name__ == "__main__":
                     quantity_in_file+=1
             if quantity_plugged>quantity_in_file:
                 Search_sens()
+
 
             if call_System_tick_1_sec.is_alive() == False:
                 restart = 1
@@ -1387,8 +1391,8 @@ if __name__ == "__main__":
             if call_Read_temps.is_alive() == False:
                 restart = 1
             if restart == 1:
-                pass
-                #os.system(cmd)
+                #pass
+                os.system(cmd)
 
             main = 0
 
