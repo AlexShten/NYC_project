@@ -245,7 +245,7 @@ def Request_data_to_server():
         if write_data_thread_status == 1 and set_WiFi == 0 and update == 0:
 
             # print(connection_for_data_and_variables.isolation_level)
-            print("Server request")
+            #print("Server request")
 
             data_time = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             data_list = (
@@ -991,6 +991,13 @@ def Read_temp_id_from_file():
 def Read_temps():
     global write_error_thread_status, sensors_in_system
     global data_t1, error_t1, data_t2, error_t2, data_t3, error_t3, data_t4, error_t4, data_t5, error_t5, data_t6, error_t6, data_t7, error_t7
+    temp1 = 0
+    temp2 = 0
+    temp3 = 0
+    temp4 = 0
+    temp5 = 0
+    temp6 = 0
+    temp7 = 0
     sensor1_error = 1
     sensor2_error = 1
     sensor3_error = 1
@@ -1017,7 +1024,9 @@ def Read_temps():
 
         if sensor1_ready == True:
             try:
-                data_t1 = (sensor1.get_temperature()) * 1.8 + 32
+                temp1 = sensor1.get_temperature()
+                if temp1 < 75:
+                    data_t1 = temp1 * 1.8 + 32
                 if sensor1_error == 0:
                     error_t1 = 0
                     sensor1_error = 1
@@ -1042,7 +1051,9 @@ def Read_temps():
 
         if sensor2_ready == True:
             try:
-                data_t2 = (sensor2.get_temperature()) * 1.8 + 32
+                temp2 = sensor2.get_temperature()
+                if temp2 < 75:
+                    data_t2 = temp2 * 1.8 + 32
                 if sensor2_error == 0:
                     error_t2 = 0
                     sensor2_error = 1
@@ -1067,7 +1078,9 @@ def Read_temps():
 
         if sensor3_ready == True:
             try:
-                data_t3 = (sensor3.get_temperature()) * 1.8 + 32
+                temp3 = sensor3.get_temperature()
+                if temp3 < 75:
+                    data_t3 = temp3 * 1.8 + 32
                 if sensor3_error == 0:
                     error_t3 = 0
                     sensor3_error = 1
@@ -1092,7 +1105,9 @@ def Read_temps():
 
         if sensor4_ready == True:
             try:
-                data_t4 = (sensor4.get_temperature()) * 1.8 + 32
+                temp4 = sensor4.get_temperature()
+                if temp4 < 75:
+                    data_t4 = temp4 * 1.8 + 32
                 if sensor4_error == 0:
                     error_t4 = 0
                     sensor4_error = 1
@@ -1117,7 +1132,9 @@ def Read_temps():
 
         if sensor5_ready == True:
             try:
-                data_t5 = (sensor5.get_temperature()) * 1.8 + 32
+                temp5 = sensor5.get_temperature()
+                if temp5 < 75:
+                    data_t5 = temp5 * 1.8 + 32
                 if sensor5_error == 0:
                     error_t5 = 0
                     sensor5_error = 1
@@ -1142,7 +1159,9 @@ def Read_temps():
 
         if sensor6_ready == True:
             try:
-                data_t6 = (sensor6.get_temperature()) * 1.8 + 32
+                temp6 = sensor6.get_temperature()
+                if temp6 < 75:
+                    data_t6 = temp6 * 1.8 + 32
                 if sensor6_error == 0:
                     error_t6 = 0
                     sensor6_error = 1
@@ -1167,7 +1186,9 @@ def Read_temps():
 
         if sensor7_ready == True:
             try:
-                data_t7 = (sensor7.get_temperature()) * 1.8 + 32
+                temp7 = sensor7.get_temperature()
+                if temp7 < 75:
+                    data_t7 = temp7 * 1.8 + 32
                 if sensor7_error == 0:
                     error_t7 = 0
                     sensor7_error = 1
@@ -1250,6 +1271,7 @@ def Init_WiFi():
     wifi_recconnect_flag = 0
 
 
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -1310,6 +1332,7 @@ call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 
 if __name__ == "__main__":
 
+
     time.sleep(5)
 
     TZ = time.tzname[0]
@@ -1332,7 +1355,7 @@ if __name__ == "__main__":
     IO_update()
 
     # call_Request_localDB.start()
-    time.sleep(1)
+    time.sleep(5)
     call_Check_connection.start()
     check_thread_status = 1
     time.sleep(1)
@@ -1345,7 +1368,7 @@ if __name__ == "__main__":
     while True:
         if main == 1:
 
-            print("MAIN")
+            #print("MAIN")
 
             IO_update()
 
@@ -1410,6 +1433,9 @@ if __name__ == "__main__":
             if restart == 1:
                 # pass
                 os.system(cmd)
+
+            #if watchdog > 60:
+            #    os.system(cmd)
 
             main = 0
 
