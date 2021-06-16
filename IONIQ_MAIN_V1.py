@@ -1404,15 +1404,19 @@ if __name__ == "__main__":
                 Update_source()
 
             # ---------------------------???????????????How to replace sensor???????
-            quantity_plugged = 0
-            for sens in W1ThermSensor.get_available_sensors():
-                quantity_plugged += 1
-            quantity_in_file = 0
-            for i in range(quantity_temp_sens):
-                if sensors_in_system[i] != None:
-                    quantity_in_file += 1
-            if quantity_plugged > quantity_in_file:
-                Search_sens()
+
+            try:
+                quantity_plugged = 0
+                for sens in W1ThermSensor.get_available_sensors():
+                    quantity_plugged += 1
+                quantity_in_file = 0
+                for i in range(quantity_temp_sens):
+                    if sensors_in_system[i] != None:
+                        quantity_in_file += 1
+                if quantity_plugged > quantity_in_file:
+                    Search_sens()
+            except:
+                pass
 
             if call_System_tick_1_sec.is_alive() == False:
                 restart = 1
