@@ -210,7 +210,7 @@ def Create_connection():
                                                                  connect_timeout=2)  # , connect_timeout=1, options='-c statement_timeout=1000')
             if connection_for_data_and_variables != None:
                 cursor = connection_for_data_and_variables.cursor()
-                WIFI_LED_ON = 0
+
         #             else:
         #                 DB_switch_EXTERNAL_LOCAL()
         #                 print("else1")
@@ -224,7 +224,7 @@ def Create_connection():
 def Request_data_to_server():
     global server_host, server_dbname, server_username, server_password
     global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list, update
-    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog, therm_bits, pump_bits, server_request_repeats
+    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, retries, watchdog, therm_bits, pump_bits, server_request_repeats
 
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass, correct_variables
 
@@ -786,7 +786,7 @@ def IO_update():
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
             WIFI_LED_ON = 1
-            time.sleep(2)
+            time.sleep(4)
             os.system(cmd)
 
     if last_bias != bias:
@@ -1396,7 +1396,7 @@ if __name__ == "__main__":
                 os.system(cmd)
 
             if variable_wifipass == "1" and variable_wifiid == "0":
-                GPIO.output(pin_LED_WiFi, GPIO.HIGH)
+                WIFI_LED_ON = 1
                 set_WiFi = 1
 
                 time.sleep(3)
