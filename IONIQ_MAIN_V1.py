@@ -784,7 +784,7 @@ def IO_update():
     if reset_temp_repeat > 5:
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
-            GPIO.output(pin_LED_WiFi, GPIO.HIGH)
+            LED_blink(1)
             time.sleep(2)
             os.system(cmd)
 
