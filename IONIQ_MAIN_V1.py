@@ -241,6 +241,7 @@ def Request_data_to_server():
     connection_for_data_and_variables = None
     Create_connection()
 
+    WIFI_LED_ON = 0
     while True:
 
         if write_data_thread_status == 1 and set_WiFi == 0 and update == 0:
@@ -445,7 +446,7 @@ def Request_data_to_server():
                         pass
 
                 # write_data_thread_status=0
-                WIFI_LED_ON = 0
+
                 watchdog = 0
 
 
@@ -784,7 +785,7 @@ def IO_update():
     if reset_temp_repeat > 5:
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
-            LED_blink(1)
+            WIFI_LED_ON = 1
             time.sleep(2)
             os.system(cmd)
 
