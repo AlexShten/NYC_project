@@ -52,6 +52,7 @@ variables_list_old = [2, 2, 2, 2, 2]
 therm_list = [0, 0, 0]
 therm_list_old = [0, 0, 0]
 watchdog = 0
+server_request_repeats = 0
 
 reset_temp_repeat = 0
 
@@ -223,7 +224,7 @@ def Create_connection():
 def Request_data_to_server():
     global server_host, server_dbname, server_username, server_password
     global connection_for_data_and_variables, cursor, WIFI_LED_ON, set_WiFi, variables_list, update
-    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog, therm_bits, pump_bits
+    global write_data_thread_status, read_vars_thread_status, check_thread_status, to_db_status, from_db_status, WIFI_LED_ON, retries, watchdog, therm_bits, pump_bits, server_request_repeats
 
     global variable_RT1, variable_RT2, variable_RT3, variable_BLR, variable_all_OFF, variable_wifiid, variable_wifipass, correct_variables
 
@@ -246,6 +247,7 @@ def Request_data_to_server():
 
             # print(connection_for_data_and_variables.isolation_level)
             print("Server request")
+            server_request_repeats += 1
 
             data_time = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
             data_list = (
@@ -263,6 +265,7 @@ def Request_data_to_server():
                             devicedata (sn, time, zone, icsmain, icsz1, icsz2, icsz3, \
                             icsboiler, t1, t2, t3, t4, t5, t6, t7, rt1, rt2, rt3, endswitch, ps, weather) \
                             VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);', data_list)
+                        server_request_repeats = 0
                     except psycopg2.DatabaseError as e:
                         pass
                         # print("cursor.execute1")
@@ -1440,6 +1443,9 @@ if __name__ == "__main__":
 
             #if watchdog > 60:
             #    os.system(cmd)
+
+            if server_request_repeats > 5:
+                os.system(cmd)
 
             main = 0
 
