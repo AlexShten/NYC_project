@@ -171,7 +171,7 @@ def Get_time_delta():
         data_wt = delta_in_seconds
     except BaseException:
         pass
-        print("error in delta time")
+        #print("error in delta time")
 
 
 # def System_tick_05_sec():
@@ -938,8 +938,8 @@ def Search_sens():
         i = 0
         for sensor in W1ThermSensor.get_available_sensors():  # [W1ThermSensor.THERM_SENSOR_DS18B20]):
             available_sensors[i] = sensor.id
-            # os.system("sudo su")
-            # sensor.set_resolution(10, persist=True)
+            os.system("sudo su")
+            sensor.set_resolution(9, persist=True)
             i = i + 1
     except BaseException as e:
         pass
