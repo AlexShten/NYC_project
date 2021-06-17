@@ -634,7 +634,7 @@ def Check_connection():
 
 
 def IO_update():
-    global data_rt1, data_rt2, data_rt3, therm_list, therm_list_old, variables_list, variables_list_old, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, pump_bits, data_end, reset_temp_repeat
+    global data_rt1, data_rt2, data_rt3, therm_list, therm_list_old, variables_list, variables_list_old, variable_all_OFF, variable_RT1, variable_RT2, variable_RT3, variable_BLR, bias, last_bias, therm_bits, pump_bits, data_end, reset_temp_repeat, WIFI_LED_ON
 
     if variables_list[4] in range(2, 9, 3):  # all outputs in auto/manual mode
 
@@ -784,7 +784,8 @@ def IO_update():
     if reset_temp_repeat > 5:
         if os.path.exists("/home/pi/sensorsID.txt"):
             os.system('rm /home/pi/sensorsID.txt')
-
+            WIFI_LED_ON = 1
+            time.sleep(2)
             os.system(cmd)
 
     if last_bias != bias:
