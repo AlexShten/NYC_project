@@ -942,7 +942,7 @@ def Search_sens():
         for sensor in W1ThermSensor.get_available_sensors():  # [W1ThermSensor.THERM_SENSOR_DS18B20]):
             available_sensors[i] = sensor.id
             #os.system("sudo su")
-            sensor.set_resolution(9, persist=True)
+            #sensor.set_resolution(9, persist=True)
             i = i + 1
     except BaseException as e:
         pass
