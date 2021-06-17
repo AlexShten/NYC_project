@@ -247,7 +247,6 @@ def Request_data_to_server():
         if write_data_thread_status == 1 and set_WiFi == 0 and update == 0:
 
             # print(connection_for_data_and_variables.isolation_level)
-            print("Server request")
             server_request_repeats += 1
 
             data_time = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
@@ -1372,8 +1371,6 @@ if __name__ == "__main__":
 
     while True:
         if main == 1:
-
-            print("MAIN")
 
             IO_update()
 
