@@ -1355,7 +1355,7 @@ if __name__ == "__main__":
     IO_update()
 
     # call_Request_localDB.start()
-    time.sleep(5)
+    time.sleep(3)
     call_Check_connection.start()
     check_thread_status = 1
     time.sleep(1)
