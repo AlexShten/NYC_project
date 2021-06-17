@@ -1,3 +1,4 @@
+import subprocess
 import os
 import sys
 import threading
@@ -173,6 +174,16 @@ def Get_time_delta():
     except BaseException:
         pass
         #print("error in delta time")
+
+def Get_CPU_temp():
+    global data_wt
+    try:
+        out = subprocess.run(['vcgencmd', 'measure_temp'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        data_wt = int(float(out[out.find('=')+1:out.find('\''):1]))
+    except BaseException:
+        pass
+        #print("error in delta time")
+
 
 
 # def System_tick_05_sec():
@@ -1374,7 +1385,8 @@ if __name__ == "__main__":
 
             IO_update()
 
-            Get_time_delta()
+            #Get_time_delta()
+            Get_CPU_temp()
 
             if wait_wifi > wait_times[wifi_recconnect_repeat]:
 
