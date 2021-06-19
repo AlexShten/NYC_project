@@ -1285,6 +1285,11 @@ def Init_WiFi():
 
     wifi_recconnect_flag = 0
 
+def stroke_watchdog():
+    f = open('/dev/watchdog','w')
+    f.write("S")
+    f.close()
+
 
 
 GPIO.setmode(GPIO.BCM)
@@ -1347,6 +1352,10 @@ call_Read_temps = threading.Thread(target=Read_temps, args=(), daemon=True)
 
 if __name__ == "__main__":
 
+    os.system('sudo modprobe bcm2708_wdog')
+    os.system('echo "bcm2708_wdog" | sudo tee -a /etc/modules')
+
+
 
     time.sleep(5)
 
@@ -1379,6 +1388,8 @@ if __name__ == "__main__":
     call_Request_error_to_server.start()
 
     Read_temp_id_from_file()
+
+    stroke_watchdog()
 
     while True:
         if main == 1:
